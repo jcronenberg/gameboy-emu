@@ -914,12 +914,13 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xcc => {unimplemented_instruction(&state)},
         0xcd => { //CALL NN
             // TODO this may be incorrect, check this maybe later
+            state.pc += 2;
             state.sp -= 2;
-            state.memory[state.sp] = opcode[2];
-            state.memory[state.sp + 1] = opcode[1];
+            state.memory[state.sp] = (state.pc & 0xff) as u8;
+            state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
             state.pc = shift_nn(opcode[2], opcode[1]);
-            println!("CALL NN nn: {:02x}{:02x}, pc: {:02x}, sp: {:02x} (sp): {:02x}{:02x}",
-                     opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp], state.memory[state.sp + 1]); //debug
+            println!("CALL NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                     opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]); //debug
         },
         0xce => {unimplemented_instruction(&state)},
         0xcf => {unimplemented_instruction(&state)},
