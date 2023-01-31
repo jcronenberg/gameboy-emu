@@ -229,7 +229,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("DEC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h);
         },
         0x16 => {unimplemented_instruction(&state)},
-        0x17 => {unimplemented_instruction(&state)},
+        0x17 => { //RLA
+            RL!(state.a, state);
+            state.flags.z = false;
+            println!("(Above was RLA, flags.z = false)")
+        },
         0x18 => {unimplemented_instruction(&state)},
         0x19 => {unimplemented_instruction(&state)},
         0x1a => { //LD A,(DE)
