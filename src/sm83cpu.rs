@@ -183,10 +183,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
             dec_n(&mut state.b, &mut state.flags);
             println!("DEC B b: {:02x}, flags.z: {}, flags.h: {}", state.b, state.flags.z, state.flags.h); //debug
         },
-        0x06 => { //LD B,N
+        0x06 => { //LD B,d8
             state.b = opcode[1];
             state.pc += 1;
-            println!("LD B b: {:02x}", state.b);
+            println!("LD B,d8 b: {:02x}", state.b);
         },
         0x07 => {unimplemented_instruction(&state)},
         0x08 => {unimplemented_instruction(&state)},
@@ -763,7 +763,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
                     state.flags.z = 0b01000000 == state.h & 0b01000000;
                     state.flags.n = false;
                     state.flags.h = true;
-                    println!("BIT 7,H flags.z: {}", state.flags.z)
+                    println!("BIT 7,H flags.z: {}", state.flags.z); //debug
                 },
                 // 0x7d => println!("0x7d"),
                 // 0x7e => println!("0x7e"),
@@ -906,7 +906,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.memory[state.sp] = opcode[2];
             state.memory[state.sp + 1] = opcode[1];
             state.pc = shift_nn(opcode[2], opcode[1]);
-            println!("CALL NN nn: {:02x}{:02x}, pc: {:02x}", opcode[2], opcode[1], state.pc); //debug
+            println!("CALL NN nn: {:02x}{:02x}, pc: {:02x}, sp: {:02x} (sp): {:02x}{:02x}",
+                     opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp], state.memory[state.sp + 1]); //debug
         },
         0xce => {unimplemented_instruction(&state)},
         0xcf => {unimplemented_instruction(&state)},
@@ -940,7 +941,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
 
         0xe0 => { //LDH (a8),A
             state.memory[(0xff00 & opcode[1] as u16) as usize] = state.a;
-            println!("LD (0xff00+a8),A (0xff{:02x}): {:02x}, a: {:02x}", opcode[1], state.memory[(0xff00 & opcode[1] as u16) as usize], state.a); //debug
+            println!("LD (0xff00+a8),A (0xff{:02x}): {:02x}, a: {:02x}",
+                     opcode[1], state.memory[(0xff00 & opcode[1] as u16) as usize], state.a); //debug
             state.pc += 1;
         },
         0xe1 => { //POP HL
@@ -951,7 +953,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0xe2 => { //LD (C),A
             state.memory[(0xff00 & state.c as u16) as usize] = state.a;
-            println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}", state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a); //debug
+            println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}",
+                     state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a); //debug
         },
         0xe3 => {unimplemented_instruction(&state)},
         0xe4 => {unimplemented_instruction(&state)},
