@@ -600,7 +600,12 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xbf => {unimplemented_instruction(&state)},
 
         0xc0 => {unimplemented_instruction(&state)},
-        0xc1 => {unimplemented_instruction(&state)},
+        0xc1 => { //POP BC
+            state.c = state.memory[state.sp];
+            state.b = state.memory[state.sp + 1];
+            state.sp += 2;
+            println!("POP BC b: {:02x}, c: {:02x}, sp: {:02x}", state.b, state.c, state.sp); //debug
+        },
         0xc2 => { //JP NZ,a16
             if state.flags.z {
                 state.pc = shift_nn(opcode[2], opcode[1]);
@@ -614,7 +619,12 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("JP pc: {:04x}", state.pc); //debug
         },
         0xc4 => {unimplemented_instruction(&state)},
-        0xc5 => {unimplemented_instruction(&state)},
+        0xc5 => { //PUSH BC
+            state.sp -= 2;
+            state.memory[state.sp] = state.b;
+            state.memory[state.sp + 1] = state.c;
+            println!("PUSH BC (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+        },
         0xc6 => {unimplemented_instruction(&state)},
         0xc7 => {unimplemented_instruction(&state)},
         0xc8 => {unimplemented_instruction(&state)},
@@ -900,11 +910,21 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xcf => {unimplemented_instruction(&state)},
 
         0xd0 => {unimplemented_instruction(&state)},
-        0xd1 => {unimplemented_instruction(&state)},
+        0xd1 => { //POP DE
+            state.e = state.memory[state.sp];
+            state.d = state.memory[state.sp + 1];
+            state.sp += 2;
+            println!("POP DE d: {:02x}, e: {:02x}, sp: {:02x}", state.d, state.e, state.sp); //debug
+        },
         0xd2 => {unimplemented_instruction(&state)},
         0xd3 => {unimplemented_instruction(&state)},
         0xd4 => {unimplemented_instruction(&state)},
-        0xd5 => {unimplemented_instruction(&state)},
+        0xd5 => { //PUSH DE
+            state.sp -= 2;
+            state.memory[state.sp] = state.d;
+            state.memory[state.sp + 1] = state.e;
+            println!("PUSH DE (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+        },
         0xd6 => {unimplemented_instruction(&state)},
         0xd7 => {unimplemented_instruction(&state)},
         0xd8 => {unimplemented_instruction(&state)},
@@ -921,14 +941,24 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("LD (0xff00+a8),A (0xff{:02x}): {:02x}, a: {:02x}", opcode[1], state.memory[(0xff00 & opcode[1] as u16) as usize], state.a); //debug
             state.pc += 1;
         },
-        0xe1 => {unimplemented_instruction(&state)},
+        0xe1 => { //POP HL
+            state.l = state.memory[state.sp];
+            state.h = state.memory[state.sp + 1];
+            state.sp += 2;
+            println!("POP HL h: {:02x}, l: {:02x}, sp: {:02x}", state.h, state.l, state.sp); //debug
+        },
         0xe2 => { //LD (C),A
             state.memory[(0xff00 & state.c as u16) as usize] = state.a;
             println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}", state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a); //debug
         },
         0xe3 => {unimplemented_instruction(&state)},
         0xe4 => {unimplemented_instruction(&state)},
-        0xe5 => {unimplemented_instruction(&state)},
+        0xe5 => { //PUSH HL
+            state.sp -= 2;
+            state.memory[state.sp] = state.h;
+            state.memory[state.sp + 1] = state.l;
+            println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+        },
         0xe6 => {unimplemented_instruction(&state)},
         0xe7 => {unimplemented_instruction(&state)},
         0xe8 => {unimplemented_instruction(&state)},
