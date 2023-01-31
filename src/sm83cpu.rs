@@ -156,9 +156,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
         // println!("{}: {}", i, opcode[i]); //debug
     }
 
+
+    print!("{:04x} {:02x}: ", state.pc, opcode[0]); //debug
+
     state.pc += 1;
 
-    print!("{:02x}: ", opcode[0]);
     match opcode[0] {
         0x00 => {}, //NOP
         0x01 => { //LD BC,d16
