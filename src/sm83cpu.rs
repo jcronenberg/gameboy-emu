@@ -222,11 +222,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x14 => { //INC D
             inc_n(&mut state.d, &mut state.flags);
-            println!("INC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h);
+            println!("INC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h); //debug
         },
         0x15 => { //DEC D
             dec_n(&mut state.d, &mut state.flags);
-            println!("DEC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h);
+            println!("DEC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h); //debug
         },
         0x16 => {unimplemented_instruction(&state)},
         0x17 => { //RLA
@@ -257,9 +257,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 1;
             if !state.flags.z {
                 state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
-                println!("JR to {:04x}", state.pc)
+                println!("JR to {:04x}", state.pc) //debug
             } else {
-                println!("No JR")
+                println!("No JR") //debug
             }
         },
         0x21 => { //LD HL,d16
@@ -275,11 +275,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x24 => { // INC H
             inc_n(&mut state.h, &mut state.flags);
-            println!("INC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h);
+            println!("INC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h); //debug
         },
         0x25 => { //DEC H
             dec_n(&mut state.h, &mut state.flags);
-            println!("DEC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h);
+            println!("DEC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h); //debug
         },
         0x26 => {unimplemented_instruction(&state)},
         0x27 => {unimplemented_instruction(&state)},
@@ -611,7 +611,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
                 state.pc = shift_nn(opcode[2], opcode[1]);
                 println!("JP pc: {:04x}", state.pc); //debug
             } else {
-                println!("JP skipped!");
+                println!("JP skipped!"); //debug
             }
         },
         0xc3 => { //JP a16
@@ -631,7 +631,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xc9 => {unimplemented_instruction(&state)},
         0xca => {unimplemented_instruction(&state)},
         0xcb => { // PREFIX
-            print!("Prefix: ");
+            print!("Prefix: "); //debug
             state.pc += 1;
             match opcode[1] {
                 // 0x01 => println!("0x01"),
