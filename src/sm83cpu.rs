@@ -74,6 +74,20 @@ macro_rules! LD {
     };
 }
 
+macro_rules! RL {
+    ($a:expr,$b:expr) => {
+        let tmp: u16 = if $b.flags.c { (($a as u16) << 1) + 1 } else { ($a as u16) << 1 };
+        $a = (tmp & 0xff) as u8;
+        $b.flags.z = $a == 0x0;
+        $b.flags.n = false;
+        $b.flags.h = false;
+        $b.flags.c = 0x100 == tmp & 0x100;
+        print!("RL {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
+        print_flags!($b.flags); //debug
+        println!(); //debug
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
