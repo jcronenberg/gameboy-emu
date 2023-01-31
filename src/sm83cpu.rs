@@ -1002,7 +1002,17 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xfb => {unimplemented_instruction(&state)},
         0xfc => {unimplemented_instruction(&state)},
         0xfd => {unimplemented_instruction(&state)},
-        0xfe => {unimplemented_instruction(&state)},
+        0xfe => { //CP d8
+            let tmp = state.a;
+            let tmp2: u16 = (tmp as u16).wrapping_sub(opcode[1] as u16);
+            state.flags.c = (tmp2 & 0xff00) > 0x0;
+            state.flags.h = 0x10 == (tmp & 0xf).wrapping_sub(opcode[1] & 0xf) & 0x10;
+            state.flags.z = tmp2 == 0x0;
+            state.flags.n = true;
+            print!("CP {:02x} a: {:02x} ", opcode[1], state.a); //debug
+            print_flags!(state.flags); //debug
+            println!(); //debug
+        },
         0xff => {unimplemented_instruction(&state)},
         // _ => unreachable!()
     }
