@@ -325,86 +325,201 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x3f => {unimplemented_instruction(&state)},
 
-        0x40 => {unimplemented_instruction(&state)},
+        0x40 => { //LD B,B
+            LD!(state.b, state.b);
+        },
         0x41 => { //LD B,C
-            state.b = state.c;
-            println!("LD B,C b: {:02x} c: {:02x}", state.b, state.c); //debug
+            LD!(state.b, state.c);
         },
         0x42 => { //LD B,D
-            state.b = state.d;
-            println!("LD B,D b: {:02x} c: {:02x}", state.b, state.d); //debug
+            LD!(state.b, state.d);
         },
         0x43 => { //LD B,E
-            state.b = state.e;
-            println!("LD B,E b: {:02x} c: {:02x}", state.b, state.e); //debug
+            LD!(state.b, state.e);
         },
-        0x44 => {unimplemented_instruction(&state)},
-        0x45 => {unimplemented_instruction(&state)},
-        0x46 => {unimplemented_instruction(&state)},
-        0x47 => {unimplemented_instruction(&state)},
-        0x48 => {unimplemented_instruction(&state)},
-        0x49 => {unimplemented_instruction(&state)},
-        0x4a => {unimplemented_instruction(&state)},
-        0x4b => {unimplemented_instruction(&state)},
-        0x4c => {unimplemented_instruction(&state)},
-        0x4d => {unimplemented_instruction(&state)},
-        0x4e => {unimplemented_instruction(&state)},
-        0x4f => {unimplemented_instruction(&state)},
+        0x44 => { //LD B,H
+            LD!(state.b, state.h);
+        },
+        0x45 => { //LD B,L
+            LD!(state.b, state.l);
+        },
+        0x46 => { //LD B,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x47 => { //LD B,A
+            LD!(state.b, state.a);
+        },
+        0x48 => { //LD C,B
+            LD!(state.c, state.b);
+        },
+        0x49 => { //LD C,C
+            LD!(state.c, state.c);
+        },
+        0x4a => { //LD C,D
+            LD!(state.c, state.d);
+        },
+        0x4b => { //LD C,E
+            LD!(state.c, state.e);
+        },
+        0x4c => { //LD C,H
+            LD!(state.c, state.h);
+        },
+        0x4d => { //LD C,L
+            LD!(state.c, state.l);
+        },
+        0x4e => { //LD C,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x4f => { //LD C,A
+            LD!(state.c, state.a);
+        },
 
-        0x50 => {unimplemented_instruction(&state)},
-        0x51 => {unimplemented_instruction(&state)},
-        0x52 => {unimplemented_instruction(&state)},
-        0x53 => {unimplemented_instruction(&state)},
-        0x54 => {unimplemented_instruction(&state)},
-        0x55 => {unimplemented_instruction(&state)},
-        0x56 => {unimplemented_instruction(&state)},
-        0x57 => {unimplemented_instruction(&state)},
-        0x58 => {unimplemented_instruction(&state)},
-        0x59 => {unimplemented_instruction(&state)},
-        0x5a => {unimplemented_instruction(&state)},
-        0x5b => {unimplemented_instruction(&state)},
-        0x5c => {unimplemented_instruction(&state)},
-        0x5d => {unimplemented_instruction(&state)},
-        0x5e => {unimplemented_instruction(&state)},
-        0x5f => {unimplemented_instruction(&state)},
+        0x50 => { //LD D,B
+            LD!(state.d, state.b);
+        },
+        0x51 => { //LD D,C
+            LD!(state.d, state.c);
+        },
+        0x52 => { //LD D,D
+            LD!(state.d, state.d);
+        },
+        0x53 => { //LD D,E
+            LD!(state.d, state.e);
+        },
+        0x54 => { //LD D,H
+            LD!(state.d, state.h);
+        },
+        0x55 => { //LD D,L
+            LD!(state.d, state.l);
+        },
+        0x56 => { //LD D,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x57 => { //LD D,A
+            LD!(state.d, state.a);
+        },
+        0x58 => { //LD E,B
+            LD!(state.e, state.b);
+        },
+        0x59 => { //LD E,C
+            LD!(state.e, state.c);
+        },
+        0x5a => { //LD E,D
+            LD!(state.e, state.d);
+        },
+        0x5b => { //LD E,E
+            LD!(state.e, state.e);
+        },
+        0x5c => { //LD E,H
+            LD!(state.e, state.h);
+        },
+        0x5d => { //LD E,L
+            LD!(state.e, state.l);
+        },
+        0x5e => { //LD E,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x5f => { //LD E,A
+            LD!(state.e, state.a);
+        },
 
-        0x60 => {unimplemented_instruction(&state)},
-        0x61 => {unimplemented_instruction(&state)},
-        0x62 => {unimplemented_instruction(&state)},
-        0x63 => {unimplemented_instruction(&state)},
-        0x64 => {unimplemented_instruction(&state)},
-        0x65 => {unimplemented_instruction(&state)},
-        0x66 => {unimplemented_instruction(&state)},
-        0x67 => {unimplemented_instruction(&state)},
-        0x68 => {unimplemented_instruction(&state)},
-        0x69 => {unimplemented_instruction(&state)},
-        0x6a => {unimplemented_instruction(&state)},
-        0x6b => {unimplemented_instruction(&state)},
-        0x6c => {unimplemented_instruction(&state)},
-        0x6d => {unimplemented_instruction(&state)},
-        0x6e => {unimplemented_instruction(&state)},
-        0x6f => {unimplemented_instruction(&state)},
+        0x60 => { //LD H,B
+            LD!(state.h, state.b);
+        },
+        0x61 => { //LD H,C
+            LD!(state.h, state.c);
+        },
+        0x62 => { //LD H,D
+            LD!(state.h, state.d);
+        },
+        0x63 => { //LD H,E
+            LD!(state.h, state.e);
+        },
+        0x64 => { //LD H,H
+            LD!(state.h, state.h);
+        },
+        0x65 => { //LD H,L
+            LD!(state.h, state.l);
+        },
+        0x66 => { //LD H,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x67 => { //LD H,A
+            LD!(state.h, state.a);
+        },
+        0x68 => { //LD L,B
+            LD!(state.l, state.b);
+        },
+        0x69 => { //LD L,C
+            LD!(state.l, state.c);
+        },
+        0x6a => { //LD L,D
+            LD!(state.l, state.d);
+        },
+        0x6b => { //LD L,E
+            LD!(state.l, state.e);
+        },
+        0x6c => { //LD L,H
+            LD!(state.l, state.h);
+        },
+        0x6d => { //LD L,L
+            LD!(state.l, state.l);
+        },
+        0x6e => { //LD L,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x6f => { //LD L,A
+            LD!(state.l, state.a);
+        },
 
-        0x70 => {unimplemented_instruction(&state)},
-        0x71 => {unimplemented_instruction(&state)},
-        0x72 => {unimplemented_instruction(&state)},
-        0x73 => {unimplemented_instruction(&state)},
-        0x74 => {unimplemented_instruction(&state)},
-        0x75 => {unimplemented_instruction(&state)},
+        0x70 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
+        0x71 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
+        0x72 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
+        0x73 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
+        0x74 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
+        0x75 => { //LD (HL),
+            unimplemented_instruction(&state);
+        },
         0x76 => {unimplemented_instruction(&state)},
         0x77 => { //LD (HL),A
             state.memory[shift_nn(state.h, state.l) as usize] = state.a;
             println!("LD (HL),A ({:04x}): {:02x}, a: {:02x}", shift_nn(state.h, state.l),
                 state.memory[shift_nn(state.h, state.l) as usize], state.a); //debug
         },
-        0x78 => {unimplemented_instruction(&state)},
-        0x79 => {unimplemented_instruction(&state)},
-        0x7a => {unimplemented_instruction(&state)},
-        0x7b => {unimplemented_instruction(&state)},
-        0x7c => {unimplemented_instruction(&state)},
-        0x7d => {unimplemented_instruction(&state)},
-        0x7e => {unimplemented_instruction(&state)},
-        0x7f => {unimplemented_instruction(&state)},
+        0x78 => { //LD A,B
+            LD!(state.a, state.b);
+        },
+        0x79 => { //LD A,C
+            LD!(state.a, state.c);
+        },
+        0x7a => { //LD A,D
+            LD!(state.a, state.d);
+        },
+        0x7b => { //LD A,E
+            LD!(state.a, state.e);
+        },
+        0x7c => { //LD A,H
+            LD!(state.a, state.h);
+        },
+        0x7d => { //LD A,L
+            LD!(state.a, state.l);
+        },
+        0x7e => { //LD A,(HL)
+            unimplemented_instruction(&state);
+        },
+        0x7f => { //LD A,A
+            LD!(state.a, state.a);
+        },
 
         0x80 => {unimplemented_instruction(&state)},
         0x81 => {unimplemented_instruction(&state)},
