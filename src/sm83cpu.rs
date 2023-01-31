@@ -627,8 +627,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xc4 => {unimplemented_instruction(&state)},
         0xc5 => { //PUSH BC
             state.sp -= 2;
-            state.memory[state.sp] = state.b;
-            state.memory[state.sp + 1] = state.c;
+            state.memory[state.sp] = state.c;
+            state.memory[state.sp + 1] = state.b;
             println!("PUSH BC (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
         },
         0xc6 => {unimplemented_instruction(&state)},
@@ -930,8 +930,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xd4 => {unimplemented_instruction(&state)},
         0xd5 => { //PUSH DE
             state.sp -= 2;
-            state.memory[state.sp] = state.d;
-            state.memory[state.sp + 1] = state.e;
+            state.memory[state.sp] = state.e;
+            state.memory[state.sp + 1] = state.d;
             println!("PUSH DE (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
         },
         0xd6 => {unimplemented_instruction(&state)},
@@ -966,8 +966,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xe4 => {unimplemented_instruction(&state)},
         0xe5 => { //PUSH HL
             state.sp -= 2;
-            state.memory[state.sp] = state.h;
-            state.memory[state.sp + 1] = state.l;
+            state.memory[state.sp] = state.l;
+            state.memory[state.sp + 1] = state.h;
             println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
         },
         0xe6 => {unimplemented_instruction(&state)},
