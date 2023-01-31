@@ -634,7 +634,13 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xc6 => {unimplemented_instruction(&state)},
         0xc7 => {unimplemented_instruction(&state)},
         0xc8 => {unimplemented_instruction(&state)},
-        0xc9 => {unimplemented_instruction(&state)},
+        0xc9 => { //RET
+            state.pc = state.memory[state.sp] as u16;
+            state.pc |= (state.memory[state.sp + 1] as u16) << 8;
+            println!("RET memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+            state.sp += 2;
+            println!("RET pc: {:04x}", state.pc); //debug
+        },
         0xca => {unimplemented_instruction(&state)},
         0xcb => { // PREFIX
             print!("Prefix: "); //debug
