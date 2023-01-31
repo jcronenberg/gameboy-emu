@@ -304,7 +304,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 2;
         },
         0x32 => { //LD (HL-),A
-            state.a = state.memory[shift_nn(state.h, state.l) as usize];
+            state.memory[shift_nn(state.h, state.l) as usize] = state.a;
             dec_nn(&mut state.h, &mut state.l);
             println!("LD (HL-),A h: {:02x}, l: {:02x}, a: {:02x}", state.h, state.l, state.a); //debug
         },
