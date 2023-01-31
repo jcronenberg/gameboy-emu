@@ -66,6 +66,14 @@ macro_rules! N_TO_STR {
     };
 }
 
+macro_rules! LD {
+    ($a:expr,$b:expr) => {
+        $a = $b;
+        println!("LD {},{} {}: {:02x} {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
