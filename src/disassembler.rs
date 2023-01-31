@@ -20,7 +20,7 @@ pub fn disassemble_8080_op(buffer: &Vec<u8>, pc: usize) -> usize {
         0x0b => println!("DCX    B"),
         0x0c => println!("INC    C"),
         0x0d => println!("DEC    C"),
-        0x0e => {println!("MVI    C,#${:02x}", buffer[pc + 1]); opbytes = 2},
+        0x0e => {println!("LD C,{:02x}", buffer[pc + 1]); opbytes = 2},
         0x0f => println!("RRC"),
 
         0x10 => println!("NOP"),
@@ -77,7 +77,7 @@ pub fn disassemble_8080_op(buffer: &Vec<u8>, pc: usize) -> usize {
         0x3b => println!("DCX    SP"),
         0x3c => println!("INC    A"),
         0x3d => println!("DEC    A"),
-        0x3e => {println!("MVI    A,#${:02x}", buffer[pc + 1]); opbytes = 2},
+        0x3e => {println!("LD A,{:02x}", buffer[pc + 1]); opbytes = 2},
         0x3f => println!("CMC"),
 
         0x40 => println!("MOV B,B"),
