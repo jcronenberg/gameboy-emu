@@ -58,6 +58,14 @@ impl State8080 {
     }
 }
 
+macro_rules! N_TO_STR {
+    ($a:expr) => {
+        stringify!($a).chars()
+                      .nth(6)
+                      .unwrap()
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
