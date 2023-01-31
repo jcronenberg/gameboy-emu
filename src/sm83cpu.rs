@@ -58,6 +58,12 @@ impl State8080 {
     }
 }
 
+macro_rules! print_flags {
+    ($a:expr) => {
+        print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
+    };
+}
+
 fn unimplemented_instruction(state: &State8080) {
     println!("\nInstruction: 0x{:02x}/{}", state.memory[state.pc as usize - 1],
              state.memory[state.pc as usize - 1]);
