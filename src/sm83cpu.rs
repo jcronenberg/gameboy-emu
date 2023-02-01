@@ -268,7 +268,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
 
         0x10 => { //STOP d8
             println!("Stopping not implemented, continuing...");
-            state.pc += 2;
+            state.pc += 1;
         },
         0x11 => { //LD DE,NN
             state.d = opcode[2];
