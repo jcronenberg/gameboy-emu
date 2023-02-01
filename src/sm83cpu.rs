@@ -96,8 +96,8 @@ macro_rules! INC {
         $b.flags.z = $a == 0;
         $b.flags.n = false;
         print!("INC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
-        print_flags!($b.flags);
-        println!();
+        print_flags!($b.flags); //debug
+        println!(); //debug
     };
     // $c is unused but is necessary to differentiate
     ($a:expr,$b:expr,$c:expr) => {
