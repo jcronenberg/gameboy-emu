@@ -30,10 +30,10 @@ fn main() {
         let length = buffer.len();
         let mut i:usize = 0;
         while i < length {
-            i += disassembler::disassemble_8080_op(&buffer, i);
+            i += disassembler::disassemble_SM83_op(&buffer, i);
         }
     } else if args[1] == "emulate" {
-        let mut state = sm83cpu::State8080::new();
+        let mut state = sm83cpu::StateSM83::new();
 
         //Load memory
         for i in 0..buffer.len() {
@@ -42,7 +42,7 @@ fn main() {
 
         //Main Loop
         loop {
-            sm83cpu::emulate_8080_op(&mut state);
+            sm83cpu::emulate_sm83_op(&mut state);
         }
     } else {
         println!("Unknown command!\n");
@@ -60,7 +60,7 @@ fn read_file_to_buf(file: &str, buffer: &mut Vec<u8>) -> io::Result<()> {
 }
 
 fn usage() {
-    println!("USAGE: i8080-emu <command> <file>\n");
+    println!("USAGE: gameboy-emu <command> <file>\n");
     println!("COMMANDS:");
     println!("disassemble   disassemble file and output to stdout");
     println!("hexdump       hexdump file and output to stdout");

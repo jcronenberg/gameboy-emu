@@ -24,7 +24,7 @@ impl Flags {
     }
 }
 
-pub struct State8080 {
+pub struct StateSM83 {
     pub a: u8,
     pub b: u8,
     pub c: u8,
@@ -39,9 +39,9 @@ pub struct State8080 {
     pub int_enable: bool,
 }
 
-impl State8080 {
-    pub fn new() -> State8080 {
-        State8080 {
+impl StateSM83 {
+    pub fn new() -> StateSM83 {
+        StateSM83 {
             a: 0,
             b: 0,
             c: 0,
@@ -188,7 +188,7 @@ macro_rules! print_flags {
     };
 }
 
-fn unimplemented_instruction(state: &State8080) {
+fn unimplemented_instruction(state: &StateSM83) {
     println!("\nInstruction: 0x{:02x}/{}", state.memory[state.pc as usize - 1],
              state.memory[state.pc as usize - 1]);
     println!("PC: {:04x}", state.pc - 1);
@@ -205,7 +205,7 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
     return tmp;
 }
 
-pub fn emulate_8080_op(state: &mut State8080) {
+pub fn emulate_sm83_op(state: &mut StateSM83) {
     // TODO fix for sm83
     // if state.pc >= 0x2000 {
     //     std::process::exit(0);
