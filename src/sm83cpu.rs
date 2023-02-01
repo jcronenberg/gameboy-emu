@@ -996,11 +996,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xde => {unimplemented_instruction(&state)},
         0xdf => {unimplemented_instruction(&state)},
 
-        0xe0 => { //LDH (a8),A
-            state.memory[(0xff00 & opcode[1] as u16) as usize] = state.a;
-            println!("LD (0xff00+a8),A (0xff{:02x}): {:02x}, a: {:02x}",
-                     opcode[1], state.memory[(0xff00 & opcode[1] as u16) as usize], state.a); //debug
+        0xe0 => { //LDH (a8),A [LD (0xff00+a8),A]
             state.pc += 1;
+            LD!(state.memory[(0xff00 + opcode[1] as u16) as usize], state.a);
+            println!("(above was)LD (0xff00+a8),A ({:04x}): {:02x} a: {:02x}", 0xff00 + opcode[1] as u16,
+                     state.memory[(0xff00 + opcode[1] as u16) as usize], state.a); //debug
         },
         0xe1 => { //POP HL
             state.l = state.memory[state.sp];
