@@ -698,14 +698,30 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xb5 => {unimplemented_instruction(&state)},
         0xb6 => {unimplemented_instruction(&state)},
         0xb7 => {unimplemented_instruction(&state)},
-        0xb8 => {unimplemented_instruction(&state)},
-        0xb9 => {unimplemented_instruction(&state)},
-        0xba => {unimplemented_instruction(&state)},
-        0xbb => {unimplemented_instruction(&state)},
-        0xbc => {unimplemented_instruction(&state)},
-        0xbd => {unimplemented_instruction(&state)},
-        0xbe => {unimplemented_instruction(&state)},
-        0xbf => {unimplemented_instruction(&state)},
+        0xb8 => { //CP B
+            CP!(state.b, state);
+        },
+        0xb9 => { //CP C
+            CP!(state.c, state);
+        },
+        0xba => { //CP D
+            CP!(state.d, state);
+        },
+        0xbb => { //CP E
+            CP!(state.e, state);
+        },
+        0xbc => { //CP H
+            CP!(state.h, state);
+        },
+        0xbd => { //CP L
+            CP!(state.l, state);
+        },
+        0xbe => { //CP (HL)
+            CP!(M_HL!(state), state);
+        },
+        0xbf => { //CP A
+            CP!(state.a, state);
+        },
 
         0xc0 => {unimplemented_instruction(&state)},
         0xc1 => { //POP BC
