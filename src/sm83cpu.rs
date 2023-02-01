@@ -227,7 +227,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
 
     // FIXME
     // tmp skip DRM
-    if state.pc == 0xe9 { state.pc += 2; println!("Skip DRM"); return; }
+    if state.pc == 0xe9 || state.pc == 0xfa { state.pc += 2; println!("Skip DRM"); return; }
 
     state.pc += 1;
 
