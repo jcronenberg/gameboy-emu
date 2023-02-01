@@ -384,7 +384,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
             DEC!(state.memory[shift_nn(state.h, state.l) as usize], state);
             println!("Above was DEC (HL)");
         },
-        0x36 => {unimplemented_instruction(&state)},
+        0x36 => { //LD (HL),d8
+            state.pc += 1;
+            LD!(M_HL!(state), opcode[1]);
+        },
         0x37 => {unimplemented_instruction(&state)},
         0x38 => {unimplemented_instruction(&state)},
         0x39 => {unimplemented_instruction(&state)},
