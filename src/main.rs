@@ -64,4 +64,5 @@ fn usage() {
     println!("COMMANDS:");
     println!("disassemble   disassemble file and output to stdout");
     println!("hexdump       hexdump file and output to stdout");
+    println!("emulate       emulate file")
 }
