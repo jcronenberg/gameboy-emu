@@ -89,6 +89,18 @@ macro_rules! RL {
     };
 }
 
+macro_rules! DEC {
+    ($a:expr,$b:expr) => {
+        $b.flags.h = 0x10 == ($a & 0xf).wrapping_sub(1) & 0x10;
+        $a = $a.wrapping_sub(1);
+        $b.flags.z = $a == 0;
+        $b.flags.n = true;
+        print!("DEC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
+        print_flags!($b.flags); //debug
+        println!(); //debug
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
