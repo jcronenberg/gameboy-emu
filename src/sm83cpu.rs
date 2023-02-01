@@ -251,7 +251,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x08 => {unimplemented_instruction(&state)},
         0x09 => {unimplemented_instruction(&state)},
         0x0a => {unimplemented_instruction(&state)},
-        0x0b => {unimplemented_instruction(&state)},
+        0x0b => { //DEC BC
+            DEC!(state.b, state.c, state);
+        },
         0x0c => { //INC C
             INC!(state.c, state);
         },
@@ -304,7 +306,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("LD A,(DE) a: {:02x}, ({:02x}): {:02x}", state.a, shift_nn(state.d, state.e),
                      state.memory[shift_nn(state.d, state.e) as usize]); //debug
         },
-        0x1b => {unimplemented_instruction(&state)},
+        0x1b => { //DEC DE
+            DEC!(state.d, state.e, state);
+        },
         0x1c => { //INC E
             INC!(state.e, state);
         },
@@ -361,7 +365,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x29 => {unimplemented_instruction(&state)},
         0x2a => {unimplemented_instruction(&state)},
-        0x2b => {unimplemented_instruction(&state)},
+        0x2b => { //DEC HL
+            DEC!(state.h, state.l, state);
+        },
         0x2c => { //INC L
             INC!(state.l, state);
         },
@@ -402,7 +408,11 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x38 => {unimplemented_instruction(&state)},
         0x39 => {unimplemented_instruction(&state)},
         0x3a => {unimplemented_instruction(&state)},
-        0x3b => {unimplemented_instruction(&state)},
+        0x3b => { //DEC SP
+            // TODO reevaluate
+            // This may not work because sp is usize, so burrows will probably not work correctly
+            DEC!(state.sp, state);
+        },
         0x3c => { //INC A
             INC!(state.a, state);
         },
