@@ -200,8 +200,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("INC B b: {:02x}, flags.z: {}, flags.h: {}", state.b, state.flags.z, state.flags.h); //debug
         },
         0x05 => { //DEC B
-            dec_n(&mut state.b, &mut state.flags);
-            println!("DEC B b: {:02x}, flags.z: {}, flags.h: {}", state.b, state.flags.z, state.flags.h); //debug
+            DEC!(state.b, state);
         },
         0x06 => { //LD B,d8
             state.b = opcode[1];
@@ -217,7 +216,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
             inc_n(&mut state.c, &mut state.flags);
             println!("INC C c: {:02x}, flags.z: {}, flags.h: {}", state.c, state.flags.z, state.flags.h); //debug
         },
-        0x0d => {unimplemented_instruction(&state)},
+        0x0d => { //DEC C
+            DEC!(state.c, state);
+        },
         0x0e => { //LD C,d8
             state.c = opcode[1];
             state.pc += 1;
@@ -245,8 +246,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("INC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h); //debug
         },
         0x15 => { //DEC D
-            dec_n(&mut state.d, &mut state.flags);
-            println!("DEC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h); //debug
+            DEC!(state.d, state);
         },
         0x16 => {unimplemented_instruction(&state)},
         0x17 => { //RLA
@@ -266,8 +266,13 @@ pub fn emulate_8080_op(state: &mut State8080) {
             inc_n(&mut state.e, &mut state.flags);
             println!("INC E e: {:02x}, flags.z: {}, flags.h: {}", state.e, state.flags.z, state.flags.h); //debug
         },
-        0x1d => {unimplemented_instruction(&state)},
-        0x1e => {unimplemented_instruction(&state)},
+        0x1d => { //DEC E
+            DEC!(state.e, state);
+        },
+        0x1e => { //LD E,d8
+            state.pc += 1;
+            LD!(state.e, opcode[1]);
+        },
         0x1f => {unimplemented_instruction(&state)},
 
         0x20 => { //JR NZ,d8
@@ -299,8 +304,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("INC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h); //debug
         },
         0x25 => { //DEC H
-            dec_n(&mut state.h, &mut state.flags);
-            println!("DEC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h); //debug
+            DEC!(state.h, state);
         },
         0x26 => {unimplemented_instruction(&state)},
         0x27 => {unimplemented_instruction(&state)},
@@ -312,8 +316,13 @@ pub fn emulate_8080_op(state: &mut State8080) {
             inc_n(&mut state.l, &mut state.flags);
             println!("INC L l: {:02x}, flags.z: {}, flags.h: {}", state.l, state.flags.z, state.flags.h); //debug
         },
-        0x2d => {unimplemented_instruction(&state)},
-        0x2e => {unimplemented_instruction(&state)},
+        0x2d => { //DEC L
+            DEC!(state.l, state);
+        },
+        0x2e => { //LD L,d8
+            state.pc += 1;
+            LD!(state.l, opcode[1]);
+        },
         0x2f => {unimplemented_instruction(&state)},
 
         0x30 => {unimplemented_instruction(&state)},
@@ -330,8 +339,15 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x33 => { //INC SP
             state.sp = state.sp.wrapping_add(1);
         },
-        0x34 => {unimplemented_instruction(&state)},
-        0x35 => {unimplemented_instruction(&state)},
+        0x34 => { //INC (HL)
+            inc_n(&mut state.memory[shift_nn(state.h, state.l) as usize], &mut state.flags);
+            println!("INC (HL) (HL): {:02x}, h: {:02x}, l: {:02x} flags.z: {}, flags.h: {}",
+                     state.memory[shift_nn(state.h, state.l) as usize], state.h, state.l, state.flags.z, state.flags.h); //debug
+        },
+        0x35 => { //DEC (HL)
+            DEC!(state.memory[shift_nn(state.h, state.l) as usize], state);
+            println!("Above was DEC (HL)");
+        },
         0x36 => {unimplemented_instruction(&state)},
         0x37 => {unimplemented_instruction(&state)},
         0x38 => {unimplemented_instruction(&state)},
@@ -342,11 +358,13 @@ pub fn emulate_8080_op(state: &mut State8080) {
             inc_n(&mut state.a, &mut state.flags);
             println!("INC A a: {:02x}, flags.z: {}, flags.h: {}", state.a, state.flags.z, state.flags.h); //debug
         },
-        0x3d => {unimplemented_instruction(&state)},
-        0x3e => { //LD A,r8
-            state.a = opcode[1];
+        0x3d => { //DEC A
+            dec_n(&mut state.a, &mut state.flags);
+            println!("DEC A a: {:02x}, flags.z: {}, flags.h: {}", state.a, state.flags.z, state.flags.h); //debug
+        },
+        0x3e => { //LD A,d8
             state.pc += 1;
-            println!("LD A,{:02x} a: {:02x}", opcode[1], state.a); //debug
+            LD!(state.a, opcode[1]);
         },
         0x3f => {unimplemented_instruction(&state)},
 
