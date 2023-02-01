@@ -1036,6 +1036,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xfc => {unimplemented_instruction(&state)},
         0xfd => {unimplemented_instruction(&state)},
         0xfe => { //CP d8
+            state.pc += 1;
             let tmp = state.a;
             let tmp2: u16 = (tmp as u16).wrapping_sub(opcode[1] as u16);
             state.flags.c = (tmp2 & 0xff00) > 0x0;
