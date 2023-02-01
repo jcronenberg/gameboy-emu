@@ -126,6 +126,8 @@ macro_rules! DEC {
         cmb = cmb.wrapping_sub(1);
         $a = (cmb >> 8) as u8;
         $b = (cmb & 0xff) as u8;
+        println!("DEC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
     };
 }
 
