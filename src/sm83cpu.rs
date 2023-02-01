@@ -217,9 +217,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
             DEC!(state.b, state);
         },
         0x06 => { //LD B,d8
-            state.b = opcode[1];
             state.pc += 1;
-            println!("LD B,d8 b: {:02x}", state.b);
+            LD!(state.b, opcode[1]);
         },
         0x07 => {unimplemented_instruction(&state)},
         0x08 => {unimplemented_instruction(&state)},
@@ -261,7 +260,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x15 => { //DEC D
             DEC!(state.d, state);
         },
-        0x16 => {unimplemented_instruction(&state)},
+        0x16 => { //LD D,d8
+            state.pc += 1;
+            LD!(state.d, opcode[1]);
+        },
         0x17 => { //RLA
             RL!(state.a, state);
             state.flags.z = false;
@@ -323,7 +325,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x25 => { //DEC H
             DEC!(state.h, state);
         },
-        0x26 => {unimplemented_instruction(&state)},
+        0x26 => { //LD H,d8
+            state.pc += 1;
+            LD!(state.h, opcode[1]);
+        },
         0x27 => {unimplemented_instruction(&state)},
         0x28 => { //JR Z,r8
             state.pc += 1;
