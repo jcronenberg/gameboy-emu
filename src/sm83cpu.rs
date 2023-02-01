@@ -1037,7 +1037,20 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xee => {unimplemented_instruction(&state)},
         0xef => {unimplemented_instruction(&state)},
 
-        0xf0 => {unimplemented_instruction(&state)},
+        0xf0 => { //LDH A,(a8) [LD A,(0xff00+a8)]
+            state.pc += 1;
+            LD!(state.a, state.memory[(0xff00 + opcode[1] as u16) as usize]);
+            println!("(above was)LD A,(0xff00+a8) a: {:02x} ({:04x}): {:02x}", state.a,
+                     0xff00 + opcode[1] as u16, state.memory[(0xff00 + opcode[1] as u16) as usize]); //debug
+
+            //TODO tmp
+            // Since the boot sequence waits for the screen but this isn't implemented
+            // We just do it manually
+            if 0xff00 + opcode[1] as u16 == 0xff44 {
+                state.a = 0x90;
+                println!("tmp set a to 0x90");
+            }
+        },
         0xf1 => {unimplemented_instruction(&state)},
         0xf2 => {unimplemented_instruction(&state)},
         0xf3 => {unimplemented_instruction(&state)},
