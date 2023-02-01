@@ -211,6 +211,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
 
     print!("{:04x} {:02x}: ", state.pc, opcode[0]); //debug
 
+    // FIXME
+    // tmp skip DRM
+    if state.pc == 0xe9 { state.pc += 2; println!("Skip DRM"); return; }
+
     state.pc += 1;
 
     match opcode[0] {
