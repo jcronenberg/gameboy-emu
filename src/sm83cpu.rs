@@ -115,6 +115,20 @@ macro_rules! SUB {
     };
 }
 
+macro_rules! CP {
+    ($a:expr,$b:expr) => {
+        let tmp = $b.a;
+        let tmp2: u16 = (tmp as u16).wrapping_sub($a as u16);
+        $b.flags.c = (tmp2 & 0xff00) > 0x0;
+        $b.flags.h = 0x10 == (tmp & 0xf).wrapping_sub($a & 0xf) & 0x10;
+        $b.flags.z = tmp2 == 0x0;
+        $b.flags.n = true;
+        print!("CP {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
+        print_flags!($b.flags); //debug
+        println!(); //debug
+    };
+}
+
 macro_rules! M_HL {
     ($a:expr) => {
         $a.memory[shift_nn($a.h, $a.l) as usize]
@@ -1110,15 +1124,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xfd => {unimplemented_instruction(&state)},
         0xfe => { //CP d8
             state.pc += 1;
-            let tmp = state.a;
-            let tmp2: u16 = (tmp as u16).wrapping_sub(opcode[1] as u16);
-            state.flags.c = (tmp2 & 0xff00) > 0x0;
-            state.flags.h = 0x10 == (tmp & 0xf).wrapping_sub(opcode[1] & 0xf) & 0x10;
-            state.flags.z = tmp2 == 0x0;
-            state.flags.n = true;
-            print!("CP {:02x} a: {:02x} ", opcode[1], state.a); //debug
-            print_flags!(state.flags); //debug
-            println!(); //debug
+            CP!(opcode[1], state);
         },
         0xff => {unimplemented_instruction(&state)},
         // _ => unreachable!()
