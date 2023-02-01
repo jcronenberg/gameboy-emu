@@ -120,6 +120,13 @@ macro_rules! DEC {
         print_flags!($b.flags); //debug
         println!(); //debug
     };
+    // $c is unused but is necessary to differentiate
+    ($a:expr,$b:expr,$c:expr) => {
+        let mut cmb = shift_nn($a, $b);
+        cmb = cmb.wrapping_sub(1);
+        $a = (cmb >> 8) as u8;
+        $b = (cmb & 0xff) as u8;
+    };
 }
 
 macro_rules! SUB {
@@ -191,16 +198,6 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
     tmp = (shift1 as u16) << 8;
     tmp |= shift2 as u16;
     return tmp;
-}
-
-// TODO macro
-/// DEC register pair nn
-/// Doesn't set any flags
-fn dec_nn(reg1: &mut u8, reg2: &mut u8) {
-    let mut reg12 = shift_nn(*reg1, *reg2);
-    reg12 = reg12.wrapping_sub(1);
-    *reg1 = (reg12 >> 8) as u8;
-    *reg2 = (reg12 & 0xff) as u8;
 }
 
 pub fn emulate_8080_op(state: &mut State8080) {
@@ -382,9 +379,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 2;
         },
         0x32 => { //LD (HL-),A
-            M_HL!(state) = state.a;
-            dec_nn(&mut state.h, &mut state.l);
-            println!("LD (HL-),A h: {:02x}, l: {:02x}, a: {:02x}", state.h, state.l, state.a); //debug
+            LD!(M_HL!(state), state.a);
+            DEC!(state.h, state.l, state);
         },
         0x33 => { //INC SP
             state.sp = state.sp.wrapping_add(1);
