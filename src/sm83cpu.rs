@@ -115,6 +115,12 @@ macro_rules! SUB {
     };
 }
 
+macro_rules! M_HL {
+    ($a:expr) => {
+        $a.memory[shift_nn($a.h, $a.l) as usize]
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
