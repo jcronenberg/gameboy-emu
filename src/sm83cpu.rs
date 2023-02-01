@@ -115,6 +115,20 @@ macro_rules! SUB {
     };
 }
 
+macro_rules! ADD {
+    ($a:expr,$b:expr) => {
+        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_add($a & 0xf) & 0x10;
+        let tmp: u16 = ($b.a as u16).wrapping_add($a as u16);
+        $b.flags.c = 0x100 == tmp & 0x100;
+        $b.flags.n = true;
+        $b.a = tmp as u8;
+        $b.flags.z = $b.a == 0x0;
+        print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
+        print_flags!($b.flags); //debug
+        println!(); //debug
+    };
+}
+
 macro_rules! CP {
     ($a:expr,$b:expr) => {
         let tmp = $b.a;
