@@ -307,7 +307,15 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x26 => {unimplemented_instruction(&state)},
         0x27 => {unimplemented_instruction(&state)},
-        0x28 => {unimplemented_instruction(&state)},
+        0x28 => { //JR Z,r8
+            state.pc += 1;
+            if state.flags.z {
+                state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
+                println!("JR to {:04x}", state.pc) //debug
+            } else {
+                println!("No JR") //debug
+            }
+        },
         0x29 => {unimplemented_instruction(&state)},
         0x2a => {unimplemented_instruction(&state)},
         0x2b => {unimplemented_instruction(&state)},
