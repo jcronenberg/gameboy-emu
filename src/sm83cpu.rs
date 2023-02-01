@@ -251,7 +251,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x17 => { //RLA
             RL!(state.a, state);
             state.flags.z = false;
-            println!("(Above was RLA, flags.z = false)")
+            println!("(Above was RLA, flags.z = false)"); //debug
         },
         0x18 => {unimplemented_instruction(&state)},
         0x19 => {unimplemented_instruction(&state)},
