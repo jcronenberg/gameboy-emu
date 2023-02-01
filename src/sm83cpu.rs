@@ -101,6 +101,20 @@ macro_rules! DEC {
     };
 }
 
+macro_rules! SUB {
+    ($a:expr,$b:expr) => {
+        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_sub($a & 0xf) & 0x10;
+        let tmp: u16 = ($b.a as u16).wrapping_sub($a as u16);
+        $b.flags.c = 0x100 == tmp & 0x100;
+        $b.flags.n = true;
+        $b.a = tmp as u8;
+        $b.flags.z = $b.a == 0x0;
+        print!("SUB {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
+        print_flags!($b.flags); //debug
+        println!(); //debug
+    };
+}
+
 macro_rules! print_flags {
     ($a:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
@@ -592,14 +606,30 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x8e => {unimplemented_instruction(&state)},
         0x8f => {unimplemented_instruction(&state)},
 
-        0x90 => {unimplemented_instruction(&state)},
-        0x91 => {unimplemented_instruction(&state)},
-        0x92 => {unimplemented_instruction(&state)},
-        0x93 => {unimplemented_instruction(&state)},
-        0x94 => {unimplemented_instruction(&state)},
-        0x95 => {unimplemented_instruction(&state)},
-        0x96 => {unimplemented_instruction(&state)},
-        0x97 => {unimplemented_instruction(&state)},
+        0x90 => { //SUB B
+            SUB!(state.b, state);
+        },
+        0x91 => { //SUB C
+            SUB!(state.c, state);
+        },
+        0x92 => { //SUB D
+            SUB!(state.d, state);
+        },
+        0x93 => { //SUB E
+            SUB!(state.e, state);
+        },
+        0x94 => { //SUB H
+            SUB!(state.h, state);
+        },
+        0x95 => { //SUB L
+            SUB!(state.l, state);
+        },
+        0x96 => { //SUB (HL)
+            SUB!(state.memory[shift_nn(state.h, state.l) as usize], state);
+        },
+        0x97 => { //SUB A
+            SUB!(state.a, state);
+        },
         0x98 => {unimplemented_instruction(&state)},
         0x99 => {unimplemented_instruction(&state)},
         0x9a => {unimplemented_instruction(&state)},
