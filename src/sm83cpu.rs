@@ -316,7 +316,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 2;
         },
         0x22 => { //LD (HL+),A
-            state.memory[shift_nn(state.h, state.l) as usize] = state.a;
+            M_HL!(state) = state.a;
             inc_nn(&mut state.h, &mut state.l);
             println!("LD (HL+),A h: {:02x}, l: {:02x}, a: {:02x}", state.h, state.l, state.a); //debug
         },
@@ -368,7 +368,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 2;
         },
         0x32 => { //LD (HL-),A
-            state.memory[shift_nn(state.h, state.l) as usize] = state.a;
+            M_HL!(state) = state.a;
             dec_nn(&mut state.h, &mut state.l);
             println!("LD (HL-),A h: {:02x}, l: {:02x}, a: {:02x}", state.h, state.l, state.a); //debug
         },
@@ -376,12 +376,12 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.sp = state.sp.wrapping_add(1);
         },
         0x34 => { //INC (HL)
-            inc_n(&mut state.memory[shift_nn(state.h, state.l) as usize], &mut state.flags);
+            inc_n(&mut M_HL!(state), &mut state.flags);
             println!("INC (HL) (HL): {:02x}, h: {:02x}, l: {:02x} flags.z: {}, flags.h: {}",
-                     state.memory[shift_nn(state.h, state.l) as usize], state.h, state.l, state.flags.z, state.flags.h); //debug
+                     M_HL!(state), state.h, state.l, state.flags.z, state.flags.h); //debug
         },
         0x35 => { //DEC (HL)
-            DEC!(state.memory[shift_nn(state.h, state.l) as usize], state);
+            DEC!(M_HL!(state), state);
             println!("Above was DEC (HL)");
         },
         0x36 => { //LD (HL),d8
@@ -426,7 +426,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.b, state.l);
         },
         0x46 => { //LD B,(HL)
-            LD!(state.b, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.b, M_HL!(state));
         },
         0x47 => { //LD B,A
             LD!(state.b, state.a);
@@ -450,7 +450,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.c, state.l);
         },
         0x4e => { //LD C,(HL)
-            LD!(state.c, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.c, M_HL!(state));
         },
         0x4f => { //LD C,A
             LD!(state.c, state.a);
@@ -475,7 +475,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.d, state.l);
         },
         0x56 => { //LD D,(HL)
-            LD!(state.d, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.d, M_HL!(state));
         },
         0x57 => { //LD D,A
             LD!(state.d, state.a);
@@ -499,7 +499,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.e, state.l);
         },
         0x5e => { //LD E,(HL)
-            LD!(state.e, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.e, M_HL!(state));
         },
         0x5f => { //LD E,A
             LD!(state.e, state.a);
@@ -524,7 +524,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.h, state.l);
         },
         0x66 => { //LD H,(HL)
-            LD!(state.h, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.h, M_HL!(state));
         },
         0x67 => { //LD H,A
             LD!(state.h, state.a);
@@ -548,7 +548,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.l, state.l);
         },
         0x6e => { //LD L,(HL)
-            LD!(state.l, state.memory[shift_nn(state.h, state.l) as usize]);
+            LD!(state.l, M_HL!(state));
         },
         0x6f => { //LD L,A
             LD!(state.l, state.a);
@@ -574,9 +574,9 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x76 => {unimplemented_instruction(&state)},
         0x77 => { //LD (HL),A
-            state.memory[shift_nn(state.h, state.l) as usize] = state.a;
+            M_HL!(state) = state.a;
             println!("LD (HL),A ({:04x}): {:02x}, a: {:02x}", shift_nn(state.h, state.l),
-                state.memory[shift_nn(state.h, state.l) as usize], state.a); //debug
+                M_HL!(state), state.a); //debug
         },
         0x78 => { //LD A,B
             LD!(state.a, state.b);
@@ -639,7 +639,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             SUB!(state.l, state);
         },
         0x96 => { //SUB (HL)
-            SUB!(state.memory[shift_nn(state.h, state.l) as usize], state);
+            SUB!(M_HL!(state), state);
         },
         0x97 => { //SUB A
             SUB!(state.a, state);
