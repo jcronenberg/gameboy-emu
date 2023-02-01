@@ -220,9 +220,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
             DEC!(state.c, state);
         },
         0x0e => { //LD C,d8
-            state.c = opcode[1];
             state.pc += 1;
-            println!("LD C,{:02x} c: {:02x}", opcode[1], state.c);
+            LD!(state.c, opcode[1]);
         },
         0x0f => {unimplemented_instruction(&state)},
 
@@ -387,7 +386,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.b, state.l);
         },
         0x46 => { //LD B,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.b, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x47 => { //LD B,A
             LD!(state.b, state.a);
@@ -411,7 +410,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.c, state.l);
         },
         0x4e => { //LD C,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.c, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x4f => { //LD C,A
             LD!(state.c, state.a);
@@ -436,7 +435,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.d, state.l);
         },
         0x56 => { //LD D,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.d, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x57 => { //LD D,A
             LD!(state.d, state.a);
@@ -460,7 +459,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.e, state.l);
         },
         0x5e => { //LD E,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.e, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x5f => { //LD E,A
             LD!(state.e, state.a);
@@ -485,7 +484,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.h, state.l);
         },
         0x66 => { //LD H,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.h, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x67 => { //LD H,A
             LD!(state.h, state.a);
@@ -509,7 +508,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             LD!(state.l, state.l);
         },
         0x6e => { //LD L,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.l, state.memory[shift_nn(state.h, state.l) as usize]);
         },
         0x6f => { //LD L,A
             LD!(state.l, state.a);
@@ -1014,7 +1013,12 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0xe7 => {unimplemented_instruction(&state)},
         0xe8 => {unimplemented_instruction(&state)},
         0xe9 => {unimplemented_instruction(&state)},
-        0xea => {unimplemented_instruction(&state)},
+        0xea => { // LD (a16),A
+            state.pc += 2;
+            LD!(state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
+            println!("(above was)LD (a16),A ({:04x}): {:02x} a: {:02x}", shift_nn(opcode[2], opcode[1]),
+                     state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a); //debug
+        },
         0xeb => {unimplemented_instruction(&state)},
         0xec => {unimplemented_instruction(&state)},
         0xed => {unimplemented_instruction(&state)},
