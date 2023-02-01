@@ -255,8 +255,8 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x18 => { //JR r8
             state.pc += 1;
-            state.pc = state.pc.wrapping_add(opcode[1] as u16);
-            println!("JR r8 pc: {:04x}", state.pc); //debug
+            state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
+            println!("JR to {:04x}", state.pc); //debug
         },
         0x19 => {unimplemented_instruction(&state)},
         0x1a => { //LD A,(DE)
