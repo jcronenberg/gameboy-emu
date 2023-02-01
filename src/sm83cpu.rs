@@ -194,15 +194,6 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
 }
 
 // TODO macro
-/// DEC register n
-fn dec_n(reg1: &mut u8, flags: &mut Flags) {
-    flags.h = 0x10 == (*reg1 & 0xf).wrapping_sub(1) & 0x10;
-    *reg1 = reg1.wrapping_sub(1);
-    flags.z = *reg1 == 0;
-    flags.n = true;
-}
-
-// TODO macro
 /// DEC register pair nn
 /// Doesn't set any flags
 fn dec_nn(reg1: &mut u8, reg2: &mut u8) {
@@ -418,8 +409,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             INC!(state.a, state);
         },
         0x3d => { //DEC A
-            dec_n(&mut state.a, &mut state.flags);
-            println!("DEC A a: {:02x}, flags.z: {}, flags.h: {}", state.a, state.flags.z, state.flags.h); //debug
+            DEC!(state.a, state);
         },
         0x3e => { //LD A,d8
             state.pc += 1;
