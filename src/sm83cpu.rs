@@ -66,6 +66,7 @@ macro_rules! N_TO_STR {
     };
 }
 
+// TODO debug statement can be nonsense
 macro_rules! LD {
     ($a:expr,$b:expr) => {
         $a = $b;
@@ -102,6 +103,7 @@ fn unimplemented_instruction(state: &State8080) {
     std::process::exit(1);
 }
 
+// TODO macro
 /// Takes two 8 bit numbers and shifts the first to be the first
 /// 8 bits of a 16 bit number and the second as the last 8 bits
 fn shift_nn(shift1: u8, shift2: u8) -> u16 {
@@ -111,6 +113,7 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
     return tmp;
 }
 
+// TODO macro
 /// INC register pair nn
 /// Doesn't set any flags
 fn inc_nn(reg1: &mut u8, reg2: &mut u8) {
@@ -120,6 +123,7 @@ fn inc_nn(reg1: &mut u8, reg2: &mut u8) {
     *reg2 = (reg12 & 0xff) as u8;
 }
 
+// TODO macro
 /// INC register n
 fn inc_n(reg1: &mut u8, flags: &mut Flags) {
     flags.h = 0x10 == (*reg1 & 0xf).wrapping_add(1) & 0x10;
@@ -128,6 +132,7 @@ fn inc_n(reg1: &mut u8, flags: &mut Flags) {
     flags.n = false;
 }
 
+// TODO macro
 /// DEC register n
 fn dec_n(reg1: &mut u8, flags: &mut Flags) {
     flags.h = 0x10 == (*reg1 & 0xf).wrapping_sub(1) & 0x10;
@@ -136,6 +141,7 @@ fn dec_n(reg1: &mut u8, flags: &mut Flags) {
     flags.n = true;
 }
 
+// TODO macro
 /// DEC register pair nn
 /// Doesn't set any flags
 fn dec_nn(reg1: &mut u8, reg2: &mut u8) {
@@ -252,10 +258,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x1e => {unimplemented_instruction(&state)},
         0x1f => {unimplemented_instruction(&state)},
 
-        0x20 => { //JR NZ,r8
-            // TODO reevaluate
-            // Dunno if this is the "best" way to do this
-            // but it is necessary because normally this instruction is 2 bytes long
+        0x20 => { //JR NZ,d8
             state.pc += 1;
             if !state.flags.z {
                 state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
