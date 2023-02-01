@@ -163,7 +163,6 @@ fn unimplemented_instruction(state: &State8080) {
     std::process::exit(1);
 }
 
-// TODO macro
 /// Takes two 8 bit numbers and shifts the first to be the first
 /// 8 bits of a 16 bit number and the second as the last 8 bits
 fn shift_nn(shift1: u8, shift2: u8) -> u16 {
