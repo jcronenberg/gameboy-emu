@@ -89,6 +89,27 @@ macro_rules! RL {
     };
 }
 
+macro_rules! INC {
+    ($a:expr,$b:expr) => {
+        $b.flags.h = 0x10 == ($a & 0xf).wrapping_add(1) & 0x10;
+        $a = $a.wrapping_add(1);
+        $b.flags.z = $a == 0;
+        $b.flags.n = false;
+        print!("INC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
+        print_flags!($b.flags);
+        println!();
+    };
+    // $c is unused but is necessary to differentiate
+    ($a:expr,$b:expr,$c:expr) => {
+        let mut cmb = shift_nn($a, $b);
+        cmb = cmb.wrapping_add(1);
+        $a = (cmb >> 8) as u8;
+        $b = (cmb & 0xff) as u8;
+        println!("INC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
+    };
+}
+
 macro_rules! DEC {
     ($a:expr,$b:expr) => {
         $b.flags.h = 0x10 == ($a & 0xf).wrapping_sub(1) & 0x10;
@@ -173,25 +194,6 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
 }
 
 // TODO macro
-/// INC register pair nn
-/// Doesn't set any flags
-fn inc_nn(reg1: &mut u8, reg2: &mut u8) {
-    let mut reg12 = shift_nn(*reg1, *reg2);
-    reg12 = reg12.wrapping_add(1);
-    *reg1 = (reg12 >> 8) as u8;
-    *reg2 = (reg12 & 0xff) as u8;
-}
-
-// TODO macro
-/// INC register n
-fn inc_n(reg1: &mut u8, flags: &mut Flags) {
-    flags.h = 0x10 == (*reg1 & 0xf).wrapping_add(1) & 0x10;
-    *reg1 = reg1.wrapping_add(1);
-    flags.z = *reg1 == 0;
-    flags.n = false;
-}
-
-// TODO macro
 /// DEC register n
 fn dec_n(reg1: &mut u8, flags: &mut Flags) {
     flags.h = 0x10 == (*reg1 & 0xf).wrapping_sub(1) & 0x10;
@@ -243,12 +245,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
             println!("LD (BC),A bc: {:02x}, (bc): {:02x}, a: {:02x}", bc, state.memory[bc as usize], state.a) //debug
         },
         0x03 => { //INC BC
-            inc_nn(&mut state.b, &mut state.c);
-            println!("INC BC b: {:02x}, c: {:02x}", state.b, state.c); //debug
+            INC!(state.b, state.c, state);
         },
         0x04 => { //INC B
-            inc_n(&mut state.b, &mut state.flags);
-            println!("INC B b: {:02x}, flags.z: {}, flags.h: {}", state.b, state.flags.z, state.flags.h); //debug
+            INC!(state.b, state);
         },
         0x05 => { //DEC B
             DEC!(state.b, state);
@@ -263,8 +263,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x0a => {unimplemented_instruction(&state)},
         0x0b => {unimplemented_instruction(&state)},
         0x0c => { //INC C
-            inc_n(&mut state.c, &mut state.flags);
-            println!("INC C c: {:02x}, flags.z: {}, flags.h: {}", state.c, state.flags.z, state.flags.h); //debug
+            INC!(state.c, state);
         },
         0x0d => { //DEC C
             DEC!(state.c, state);
@@ -287,12 +286,10 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x12 => {unimplemented_instruction(&state)},
         0x13 => { //INC DE
-            inc_nn(&mut state.d, &mut state.e);
-            println!("INC DE d: {:02x}, e: {:02x}", state.d, state.e); //debug
+            INC!(state.d, state.e, state);
         },
         0x14 => { //INC D
-            inc_n(&mut state.d, &mut state.flags);
-            println!("INC D d: {:02x}, flags.z: {}, flags.h: {}", state.d, state.flags.z, state.flags.h); //debug
+            INC!(state.d, state);
         },
         0x15 => { //DEC D
             DEC!(state.d, state);
@@ -319,8 +316,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         },
         0x1b => {unimplemented_instruction(&state)},
         0x1c => { //INC E
-            inc_n(&mut state.e, &mut state.flags);
-            println!("INC E e: {:02x}, flags.z: {}, flags.h: {}", state.e, state.flags.z, state.flags.h); //debug
+            INC!(state.e, state);
         },
         0x1d => { //DEC E
             DEC!(state.e, state);
@@ -347,17 +343,14 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.pc += 2;
         },
         0x22 => { //LD (HL+),A
-            M_HL!(state) = state.a;
-            inc_nn(&mut state.h, &mut state.l);
-            println!("LD (HL+),A h: {:02x}, l: {:02x}, a: {:02x}", state.h, state.l, state.a); //debug
+            LD!(M_HL!(state), state.a);
+            INC!(state.h, state.l, state);
         },
         0x23 => { //INC HL
-            inc_nn(&mut state.h, &mut state.l);
-            println!("INC HL h: {:02x}, l: {:02x}", state.h, state.l); //debug
+            INC!(state.h, state.l, state);
         },
         0x24 => { // INC H
-            inc_n(&mut state.h, &mut state.flags);
-            println!("INC H h: {:02x}, flags.z: {}, flags.h: {}", state.h, state.flags.z, state.flags.h); //debug
+            INC!(state.h, state);
         },
         0x25 => { //DEC H
             DEC!(state.h, state);
@@ -380,8 +373,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x2a => {unimplemented_instruction(&state)},
         0x2b => {unimplemented_instruction(&state)},
         0x2c => { //INC L
-            inc_n(&mut state.l, &mut state.flags);
-            println!("INC L l: {:02x}, flags.z: {}, flags.h: {}", state.l, state.flags.z, state.flags.h); //debug
+            INC!(state.l, state);
         },
         0x2d => { //DEC L
             DEC!(state.l, state);
@@ -407,9 +399,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
             state.sp = state.sp.wrapping_add(1);
         },
         0x34 => { //INC (HL)
-            inc_n(&mut M_HL!(state), &mut state.flags);
-            println!("INC (HL) (HL): {:02x}, h: {:02x}, l: {:02x} flags.z: {}, flags.h: {}",
-                     M_HL!(state), state.h, state.l, state.flags.z, state.flags.h); //debug
+            INC!(M_HL!(state), state);
         },
         0x35 => { //DEC (HL)
             DEC!(M_HL!(state), state);
@@ -425,8 +415,7 @@ pub fn emulate_8080_op(state: &mut State8080) {
         0x3a => {unimplemented_instruction(&state)},
         0x3b => {unimplemented_instruction(&state)},
         0x3c => { //INC A
-            inc_n(&mut state.a, &mut state.flags);
-            println!("INC A a: {:02x}, flags.z: {}, flags.h: {}", state.a, state.flags.z, state.flags.h); //debug
+            INC!(state.a, state);
         },
         0x3d => { //DEC A
             dec_n(&mut state.a, &mut state.flags);
