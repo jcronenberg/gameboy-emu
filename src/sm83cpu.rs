@@ -242,6 +242,18 @@ macro_rules! CP {
     };
 }
 
+macro_rules! RST {
+    ($hex:expr,$state:expr) => {
+        // TODO this may be incorrect, check this maybe later
+        $state.sp -= 2;
+        $state.memory[$state.sp] = ($state.pc & 0xff) as u8;
+        $state.memory[$state.sp + 1] = (($state.pc & 0xff00) >> 8) as u8;
+        $state.pc = $hex;
+        #[cfg(debug_assertions)] println!("RST {:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}", $hex,
+                                          $state.pc, $state.sp, $state.memory[$state.sp + 1], $state.memory[$state.sp]);
+    };
+}
+
 macro_rules! M {
     ($address1:expr,$address2:expr,$state:expr) => {
         $state.memory[shift_nn($address1, $address2) as usize]
@@ -949,7 +961,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("PUSH BC (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xc6 => {unimplemented_instruction(&state)},
-        0xc7 => {unimplemented_instruction(&state)},
+        0xc7 => { //RST 00H
+            RST!(0x0, state);
+        },
         0xc8 => { //RET Z
             if state.flags.z {
                 state.pc = state.memory[state.sp] as u16;
@@ -1055,7 +1069,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                      opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
         },
         0xce => {unimplemented_instruction(&state)},
-        0xcf => {unimplemented_instruction(&state)},
+        0xcf => { //RST 08H
+            RST!(0x8, state);
+        },
 
         0xd0 => { //RET NC
             if !state.flags.c {
@@ -1093,7 +1109,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("PUSH DE (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xd6 => {unimplemented_instruction(&state)},
-        0xd7 => {unimplemented_instruction(&state)},
+        0xd7 => { //RST 10H
+            RST!(0x10, state);
+        },
         0xd8 => { //RET C
             if state.flags.c {
                 state.pc = state.memory[state.sp] as u16;
@@ -1124,7 +1142,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             unimplemented_instruction(&state)
         },
         0xde => {unimplemented_instruction(&state)},
-        0xdf => {unimplemented_instruction(&state)},
+        0xdf => { //RST 18H
+            RST!(0x18, state);
+        },
 
         0xe0 => { //LDH (a8),A [LD (0xff00+a8),A]
             state.pc += 1;
@@ -1156,7 +1176,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xe6 => {unimplemented_instruction(&state)},
-        0xe7 => {unimplemented_instruction(&state)},
+        0xe7 => { //RST 20H
+            RST!(0x20, state);
+        },
         0xe8 => {unimplemented_instruction(&state)},
         0xe9 => {unimplemented_instruction(&state)},
         0xea => { // LD (a16),A
@@ -1175,7 +1197,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             unimplemented_instruction(&state)
         },
         0xee => {unimplemented_instruction(&state)},
-        0xef => {unimplemented_instruction(&state)},
+        0xef => { //RST 28H
+            RST!(0x28, state);
+        },
 
         0xf0 => { //LDH A,(a8) [LD A,(0xff00+a8)]
             state.pc += 1;
@@ -1219,7 +1243,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!();
         },
         0xf6 => {unimplemented_instruction(&state)},
-        0xf7 => {unimplemented_instruction(&state)},
+        0xf7 => { //RST 30H
+            RST!(0x30, state);
+        },
         0xf8 => {unimplemented_instruction(&state)},
         0xf9 => {unimplemented_instruction(&state)},
         0xfa => { //LD A,(a16)
@@ -1237,7 +1263,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 1;
             CP!(opcode[1], state);
         },
-        0xff => {unimplemented_instruction(&state)},
+        0xff => { //RST 38H
+            RST!(0x30, state);
+        },
         // _ => unreachable!()
     }
 }
