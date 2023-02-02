@@ -1195,11 +1195,29 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                 #[cfg(debug_assertions)] println!("tmp set a to 0x94");
             }
         },
-        0xf1 => {unimplemented_instruction(&state)},
-        0xf2 => {unimplemented_instruction(&state)},
+        0xf1 => { //POP AF
+            m_to_flags(state.memory[state.sp], &mut state.flags);
+            state.a = state.memory[state.sp + 1];
+            state.sp += 2;
+            #[cfg(debug_assertions)] print!("POP AF a: {:02x}, sp: {:02x} ", state.h, state.sp);
+            #[cfg(debug_assertions)] print_flags!(state.flags);
+            #[cfg(debug_assertions)] println!();
+        },
+        0xf2 => { //LD A,(C)
+            LD!(state.a, state.memory[(0xff00 + state.c as u16) as usize]);
+        },
         0xf3 => {unimplemented_instruction(&state)},
-        0xf4 => {unimplemented_instruction(&state)},
-        0xf5 => {unimplemented_instruction(&state)},
+        0xf4 => { //no instruction
+            unimplemented_instruction(&state)
+        },
+        0xf5 => { //PUSH AF
+            state.sp -= 2;
+            state.memory[state.sp] = flags_to_m(&state.flags);
+            state.memory[state.sp + 1] = state.a;
+            #[cfg(debug_assertions)] print!("PUSH AF (SP): {:02x}{:02x}, sp: {:02x} ", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
+            #[cfg(debug_assertions)] print_flags!(state.flags);
+            #[cfg(debug_assertions)] println!();
+        },
         0xf6 => {unimplemented_instruction(&state)},
         0xf7 => {unimplemented_instruction(&state)},
         0xf8 => {unimplemented_instruction(&state)},
