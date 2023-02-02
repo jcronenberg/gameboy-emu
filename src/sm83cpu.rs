@@ -79,13 +79,13 @@ macro_rules! LD {
 
 macro_rules! RL {
     ($address:expr,$state:expr) => {
-        let tmp: u16 = if $state.flags.c { (($address as u16) << 1) + 1 } else { ($address as u16) << 1 };
+        let tmp: u16 = (($address as u16) << 1) | $state.flags.c as u16;
         $address = (tmp & 0xff) as u8;
         $state.flags.z = $address == 0x0;
         $state.flags.n = false;
         $state.flags.h = false;
         $state.flags.c = 0x100 == tmp & 0x100;
-        #[cfg(debug_assertions)] print!("RL {} {}: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address);
+        #[cfg(debug_assertions)] print!("RL {:02x} ", $address);
         #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
