@@ -1001,7 +1001,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             match opcode[1] >> 4 {
                 0x0 => unimplemented_instruction(state),
 
+                // RL and RR
                 0x1 => {
+                    // RL
                     if opcode[1] >> 3 & 0x1 == 0 {
                         let tmp: u16 = if state.flags.c { ((val as u16) << 1) | 0x1 } else { (val as u16) << 1 };
                         val = (tmp & 0xff) as u8;
@@ -1012,10 +1014,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                         #[cfg(debug_assertions)] print!("RL {:02x} {:02x}: {:02x} ", register, register, val);
                         #[cfg(debug_assertions)] print_flags!(state.flags);
                         #[cfg(debug_assertions)] println!();
+                    // RR
                     } else {
                         unimplemented_instruction(state);
                     }
                 },
+                // All BIT instructions
                 0x4 |
                 0x5 |
                 0x6 |
