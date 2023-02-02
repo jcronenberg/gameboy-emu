@@ -59,8 +59,8 @@ impl StateSM83 {
 }
 
 macro_rules! N_TO_STR {
-    ($a:expr) => {
-        stringify!($a).chars()
+    ($n:expr) => {
+        stringify!($n).chars()
                       .nth(6)
                       .unwrap()
     };
@@ -68,121 +68,121 @@ macro_rules! N_TO_STR {
 
 // TODO debug statement can be nonsense
 macro_rules! LD {
-    ($a:expr,$b:expr) => {
-        $a = $b;
-        #[cfg(debug_assertions)] println!("LD {},{} {}: {:02x} {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
+    ($address1:expr,$address2:expr) => {
+        $address1 = $address2;
+        #[cfg(debug_assertions)] println!("LD {},{} {}: {:02x} {}: {:02x}", N_TO_STR!($address1).to_uppercase(), N_TO_STR!($address2).to_uppercase(),
+                 N_TO_STR!($address1), $address1, N_TO_STR!($address2), $address2);
     };
 }
 
 macro_rules! RL {
-    ($a:expr,$b:expr) => {
-        let tmp: u16 = if $b.flags.c { (($a as u16) << 1) + 1 } else { ($a as u16) << 1 };
-        $a = (tmp & 0xff) as u8;
-        $b.flags.z = $a == 0x0;
-        $b.flags.n = false;
-        $b.flags.h = false;
-        $b.flags.c = 0x100 == tmp & 0x100;
-        #[cfg(debug_assertions)] print!("RL {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        let tmp: u16 = if $state.flags.c { (($address as u16) << 1) + 1 } else { ($address as u16) << 1 };
+        $address = (tmp & 0xff) as u8;
+        $state.flags.z = $address == 0x0;
+        $state.flags.n = false;
+        $state.flags.h = false;
+        $state.flags.c = 0x100 == tmp & 0x100;
+        #[cfg(debug_assertions)] print!("RL {} {}: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
 }
 
 macro_rules! INC {
-    ($a:expr,$b:expr) => {
-        $b.flags.h = 0x10 == ($a & 0xf).wrapping_add(1) & 0x10;
-        $a = $a.wrapping_add(1);
-        $b.flags.z = $a == 0;
-        $b.flags.n = false;
-        #[cfg(debug_assertions)] print!("INC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($address & 0xf).wrapping_add(1) & 0x10;
+        $address = $address.wrapping_add(1);
+        $state.flags.z = $address == 0;
+        $state.flags.n = false;
+        #[cfg(debug_assertions)] print!("INC {} {}: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
     // $c is unused but is necessary to differentiate
-    ($a:expr,$b:expr,$c:expr) => {
-        let mut cmb = shift_nn($a, $b);
+    ($address1:expr,$address1ddress2:expr,$state:expr) => {
+        let mut cmb = shift_nn($address1, $address1ddress2);
         cmb = cmb.wrapping_add(1);
-        $a = (cmb >> 8) as u8;
-        $b = (cmb & 0xff) as u8;
-        #[cfg(debug_assertions)] println!("INC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
+        $address1 = (cmb >> 8) as u8;
+        $address1ddress2 = (cmb & 0xff) as u8;
+        #[cfg(debug_assertions)] println!("INC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($address1).to_uppercase(), N_TO_STR!($address1ddress2).to_uppercase(),
+                 N_TO_STR!($address1), $address1, N_TO_STR!($address1ddress2), $address1ddress2);
     };
 }
 
 macro_rules! DEC {
-    ($a:expr,$b:expr) => {
-        $b.flags.h = 0x10 == ($a & 0xf).wrapping_sub(1) & 0x10;
-        $a = $a.wrapping_sub(1);
-        $b.flags.z = $a == 0;
-        $b.flags.n = true;
-        #[cfg(debug_assertions)] print!("DEC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($address & 0xf).wrapping_sub(1) & 0x10;
+        $address = $address.wrapping_sub(1);
+        $state.flags.z = $address == 0;
+        $state.flags.n = true;
+        #[cfg(debug_assertions)] print!("DEC {} {}: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
-    // $c is unused but is necessary to differentiate
-    ($a:expr,$b:expr,$c:expr) => {
-        let mut cmb = shift_nn($a, $b);
+    // $state is unused but is necessary to differentiate
+    ($address1:expr,$address2:expr,$state:expr) => {
+        let mut cmb = shift_nn($address1, $address2);
         cmb = cmb.wrapping_sub(1);
-        $a = (cmb >> 8) as u8;
-        $b = (cmb & 0xff) as u8;
-        #[cfg(debug_assertions)] println!("DEC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
+        $address1 = (cmb >> 8) as u8;
+        $address2 = (cmb & 0xff) as u8;
+        #[cfg(debug_assertions)] println!("DEC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($address1).to_uppercase(), N_TO_STR!($address2).to_uppercase(),
+                 N_TO_STR!($address1), $address1, N_TO_STR!($address2), $address2);
     };
 }
 
 macro_rules! SUB {
-    ($a:expr,$b:expr) => {
-        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_sub($a & 0xf) & 0x10;
-        let tmp: u16 = ($b.a as u16).wrapping_sub($a as u16);
-        $b.flags.c = 0x100 == tmp & 0x100;
-        $b.flags.n = true;
-        $b.a = tmp as u8;
-        $b.flags.z = $b.a == 0x0;
-        #[cfg(debug_assertions)] print!("SUB {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_sub($address & 0xf) & 0x10;
+        let tmp: u16 = ($state.a as u16).wrapping_sub($address as u16);
+        $state.flags.c = 0x100 == tmp & 0x100;
+        $state.flags.n = true;
+        $state.a = tmp as u8;
+        $state.flags.z = $state.a == 0x0;
+        #[cfg(debug_assertions)] print!("SUB {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
 }
 
 macro_rules! ADD {
-    ($a:expr,$b:expr) => {
-        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_add($a & 0xf) & 0x10;
-        let tmp: u16 = ($b.a as u16).wrapping_add($a as u16);
-        $b.flags.c = 0x100 == tmp & 0x100;
-        $b.flags.n = true;
-        $b.a = tmp as u8;
-        $b.flags.z = $b.a == 0x0;
-        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_add($address & 0xf) & 0x10;
+        let tmp: u16 = ($state.a as u16).wrapping_add($address as u16);
+        $state.flags.c = 0x100 == tmp & 0x100;
+        $state.flags.n = true;
+        $state.a = tmp as u8;
+        $state.flags.z = $state.a == 0x0;
+        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
 }
 
 macro_rules! ADC {
-    ($a:expr,$b:expr) => {
-        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_add($a.wrapping_add($b.flags.c as u8) & 0xf) & 0x10;
-        let tmp: u16 = ($b.a as u16).wrapping_add($a as u16);
-        $b.flags.c = 0x100 == tmp & 0x100;
-        $b.flags.n = true;
-        $b.a = tmp as u8;
-        $b.flags.z = $b.a == 0x0;
-        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_add($address.wrapping_add($state.flags.c as u8) & 0xf) & 0x10;
+        let tmp: u16 = ($state.a as u16).wrapping_add($address as u16);
+        $state.flags.c = 0x100 == tmp & 0x100;
+        $state.flags.n = true;
+        $state.a = tmp as u8;
+        $state.flags.z = $state.a == 0x0;
+        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
 }
 
 macro_rules! CP {
-    ($a:expr,$b:expr) => {
-        let tmp = $b.a;
-        let tmp2: u16 = (tmp as u16).wrapping_sub($a as u16);
-        $b.flags.c = (tmp2 & 0xff00) > 0x0;
-        $b.flags.h = 0x10 == (tmp & 0xf).wrapping_sub($a & 0xf) & 0x10;
-        $b.flags.z = tmp2 == 0x0;
-        $b.flags.n = true;
-        #[cfg(debug_assertions)] print!("CP {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
-        #[cfg(debug_assertions)] print_flags!($b.flags);
+    ($address:expr,$state:expr) => {
+        let tmp = $state.a;
+        let tmp2: u16 = (tmp as u16).wrapping_sub($address as u16);
+        $state.flags.c = (tmp2 & 0xff00) > 0x0;
+        $state.flags.h = 0x10 == (tmp & 0xf).wrapping_sub($address & 0xf) & 0x10;
+        $state.flags.z = tmp2 == 0x0;
+        $state.flags.n = true;
+        #[cfg(debug_assertions)] print!("CP {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
 }
@@ -197,8 +197,8 @@ macro_rules! M {
 }
 
 macro_rules! print_flags {
-    ($a:expr) => {
-        print!("flags: z: {}, n: {}, h: {}, c: {}", $a.z, $a.n, $a.h, $a.c);
+    ($state:expr) => {
+        print!("flags: z: {}, n: {}, h: {}, c: {}", $state.z, $state.n, $state.h, $state.c);
     };
 }
 
