@@ -4,39 +4,8 @@ use std::fs::File;
 
 use crate::sm83cpu;
 
-enum CartTypes {
-    RomOnly,
-    Mbc1,
-    Mbc1Ram,
-    Mbc1RamBat,
-    Mbc2,
-    Mbc2Bat,
-    RomRam,
-    RomRamBat,
-    Mmm01,
-    Mmm01Ram,
-    Mmm01RamBat,
-    Mbc3TimerBat,
-    Mbc3TimerRamBat,
-    Mbc3,
-    Mbc3Ram,
-    Mbc3RamBat,
-    Mbc5,
-    Mbc5Ram,
-    Mbc5RamBat,
-    Mbc5Rumble,
-    Mbc5RumbleRam,
-    Mbc5RumbleRamBat,
-    Mbc6,
-    Mbc7SensorRumbleRamBat,
-    PocketCam,
-    BandaiTama5,
-    Huc3,
-    Huc1RamBat,
-}
-
 pub struct MMU {
-    rom_type: CartTypes,
+    rom_type: u8,
     boot_finished: bool,
     boot_rom: [u8; 0x100],
     cart: [u8; 0x8000],
@@ -45,7 +14,7 @@ pub struct MMU {
 impl MMU {
     pub fn new() -> MMU {
         MMU {
-            rom_type: CartTypes::RomOnly,
+            rom_type: 0,
             boot_finished: false,
             boot_rom: [0; 0x100],
             cart: [0; 0x8000],
@@ -97,6 +66,11 @@ impl MMU {
         for i in 0..self.boot_rom.len() {
             state.memory[i] = self.boot_rom[i];
         }
+    }
+
+    pub fn read_header(&mut self) {
+        self.rom_type = self.cart[0x147];
+        #[cfg(debug_assertions)] println!("Set rom_type to {:02x}", self.rom_type);
     }
 }
 

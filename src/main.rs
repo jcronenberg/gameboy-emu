@@ -33,6 +33,7 @@ fn main() {
     mmu.load_cart(&args[2]);
     mmu.cart_to_mem(&mut state);
     mmu.boot_rom_to_mem(&mut state);
+    mmu.read_header();
 
     if args[1] == "hexdump" {
         disassembler::hexdump(buffer);
