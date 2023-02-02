@@ -187,6 +187,19 @@ macro_rules! ADC {
     };
 }
 
+macro_rules! AND {
+    ($address:expr,$state:expr) => {
+        $state.a &= $address;
+        $state.flags.z = 0x0 == $state.a;
+        $state.flags.c = false;
+        $state.flags.h = true;
+        $state.flags.n = false;
+        #[cfg(debug_assertions)] print!("AND {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! CP {
     ($address:expr,$state:expr) => {
         let tmp = $state.a;
@@ -746,14 +759,30 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             SBC!(state.a, state);
         },
 
-        0xa0 => {unimplemented_instruction(&state)},
-        0xa1 => {unimplemented_instruction(&state)},
-        0xa2 => {unimplemented_instruction(&state)},
-        0xa3 => {unimplemented_instruction(&state)},
-        0xa4 => {unimplemented_instruction(&state)},
-        0xa5 => {unimplemented_instruction(&state)},
-        0xa6 => {unimplemented_instruction(&state)},
-        0xa7 => {unimplemented_instruction(&state)},
+        0xa0 => { //AND B
+            AND!(state.b, state);
+        },
+        0xa1 => { //AND C
+            AND!(state.c, state);
+        },
+        0xa2 => { //AND D
+            AND!(state.d, state);
+        },
+        0xa3 => { //AND E
+            AND!(state.e, state);
+        },
+        0xa4 => { //AND H
+            AND!(state.h, state);
+        },
+        0xa5 => { //AND L
+            AND!(state.l, state);
+        },
+        0xa6 => { //AND (HL)
+            AND!(M!(state.h, state.l, state), state);
+        },
+        0xa7 => { //AND A
+            AND!(state.a, state);
+        },
         0xa8 => {unimplemented_instruction(&state)},
         0xa9 => {unimplemented_instruction(&state)},
         0xaa => {unimplemented_instruction(&state)},
