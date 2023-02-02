@@ -1201,7 +1201,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             } else { #[cfg(debug_assertions)] println!("RET NC not returned"); }
         },
         0xd9 => {unimplemented_instruction(&state)},
-        0xda => {unimplemented_instruction(&state)},
+        0xda => { //JP C,a16
+            if state.flags.c {
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
+        },
         0xdb => { //no instruction
             unimplemented_instruction(&state)
         },
