@@ -91,6 +91,48 @@ macro_rules! RL {
     };
 }
 
+macro_rules! RLC {
+    ($address:expr,$state:expr) => {
+        $state.flags.c = 0x8 == $address & 0x8;
+        $address = $address << 1;
+        $address |= $state.flags.c as u8;
+        $state.flags.z = $address == 0x0;
+        $state.flags.n = false;
+        $state.flags.h = false;
+        #[cfg(debug_assertions)] print!("RLC {:02x} ", $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
+macro_rules! RR {
+    ($address:expr,$state:expr) => {
+        let tmp: u16 = ($address as u16) | (($state.flags.c as u16) << 8);
+        $state.flags.c = 0x1 == tmp & 0x1;
+        $address = ((tmp >> 1) & 0xff) as u8;
+        $state.flags.z = $address == 0x0;
+        $state.flags.n = false;
+        $state.flags.h = false;
+        #[cfg(debug_assertions)] print!("RR {:02x} ", $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
+macro_rules! RRC {
+    ($address:expr,$state:expr) => {
+        $state.flags.c = 0x1 == $address & 0x1;
+        $address = $address >> 1;
+        $address |= ($state.flags.c as u8) << 7;
+        $state.flags.z = $address == 0x0;
+        $state.flags.n = false;
+        $state.flags.h = false;
+        #[cfg(debug_assertions)] print!("RRC {:02x} ", $address);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! INC {
     ($address:expr,$state:expr) => {
         $state.flags.h = 0x10 == ($address & 0xf).wrapping_add(1) & 0x10;
@@ -343,7 +385,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 1;
             LD!(state.b, opcode[1]);
         },
-        0x07 => {unimplemented_instruction(&state)},
+        0x07 => { //RLCA
+            RLC!(state.a, state);
+            state.flags.z = false;
+        },
         0x08 => {unimplemented_instruction(&state)},
         0x09 => {unimplemented_instruction(&state)},
         0x0a => {unimplemented_instruction(&state)},
@@ -360,7 +405,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 1;
             LD!(state.c, opcode[1]);
         },
-        0x0f => {unimplemented_instruction(&state)},
+        0x0f => { //RRCA
+            RRC!(state.a, state);
+            state.flags.z = false;
+        },
 
         0x10 => { //STOP d8
             println!("Stopping not implemented, continuing...");
@@ -413,7 +461,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 1;
             LD!(state.e, opcode[1]);
         },
-        0x1f => {unimplemented_instruction(&state)},
+        0x1f => { //RRA
+            RR!(state.a, state);
+            state.flags.z = false;
+        },
 
         0x20 => { //JR NZ,d8
             state.pc += 1;
@@ -982,7 +1033,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         },
         0xca => {unimplemented_instruction(&state)},
         0xcb => { // PREFIX
-            #[cfg(debug_assertions)] print!("Prefix: ");
+            #[cfg(debug_assertions)] print!("Prefix {:02x}: ", opcode[1]);
             state.pc += 1;
             let register = opcode[1] & 0x7;
             let mut val: u8 = match register {
@@ -999,24 +1050,24 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
 
             let mut write: bool = true;
             match opcode[1] >> 4 {
-                0x0 => unimplemented_instruction(state),
+                0x0 => {
+                    // RLC
+                    if opcode[1] >> 3 & 0x1 == 0 {
+                        RLC!(val, state);
+                    // RRC
+                    } else {
+                        RRC!(val, state);
+                    }
+                },
 
                 // RL and RR
                 0x1 => {
                     // RL
                     if opcode[1] >> 3 & 0x1 == 0 {
-                        let tmp: u16 = if state.flags.c { ((val as u16) << 1) | 0x1 } else { (val as u16) << 1 };
-                        val = (tmp & 0xff) as u8;
-                        state.flags.z = val == 0x0;
-                        state.flags.n = false;
-                        state.flags.h = false;
-                        state.flags.c = 0x100 == tmp & 0x100;
-                        #[cfg(debug_assertions)] print!("RL {:02x} {:02x}: {:02x} ", register, register, val);
-                        #[cfg(debug_assertions)] print_flags!(state.flags);
-                        #[cfg(debug_assertions)] println!();
+                        RL!(val, state);
                     // RR
                     } else {
-                        unimplemented_instruction(state);
+                        RR!(val, state);
                     }
                 },
                 // All BIT instructions
