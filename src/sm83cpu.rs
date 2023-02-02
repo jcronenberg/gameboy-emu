@@ -561,7 +561,13 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             LD!(M!(state.h, state.l, state), opcode[1]);
         },
         0x37 => {unimplemented_instruction(&state)},
-        0x38 => {unimplemented_instruction(&state)},
+        0x38 => { //JR C,r8
+            state.pc += 1;
+            if state.flags.c {
+                state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
+                #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc)
+            } else { #[cfg(debug_assertions)] println!("No JR") }
+        },
         0x39 => {unimplemented_instruction(&state)},
         0x3a => { //LD A,(HL-)
             LD!(state.a, M!(state.h, state.l, state));
