@@ -1188,7 +1188,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0xf7 => {unimplemented_instruction(&state)},
         0xf8 => {unimplemented_instruction(&state)},
         0xf9 => {unimplemented_instruction(&state)},
-        0xfa => {unimplemented_instruction(&state)},
+        0xfa => { //LD A,(a16)
+            state.pc += 2;
+            LD!(state.a, M!(opcode[2], opcode[1], state));
+        },
         0xfb => {unimplemented_instruction(&state)},
         0xfc => { //no instruction
             unimplemented_instruction(&state);
