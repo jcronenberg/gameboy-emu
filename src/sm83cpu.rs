@@ -167,7 +167,7 @@ macro_rules! ADC {
         $state.flags.n = true;
         $state.a = tmp as u8;
         $state.flags.z = $state.a == 0x0;
-        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print!("ADC {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
         #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
