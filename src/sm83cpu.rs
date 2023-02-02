@@ -70,8 +70,8 @@ macro_rules! N_TO_STR {
 macro_rules! LD {
     ($a:expr,$b:expr) => {
         $a = $b;
-        println!("LD {},{} {}: {:02x} {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
+        #[cfg(debug_assertions)] println!("LD {},{} {}: {:02x} {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
     };
 }
 
@@ -83,9 +83,9 @@ macro_rules! RL {
         $b.flags.n = false;
         $b.flags.h = false;
         $b.flags.c = 0x100 == tmp & 0x100;
-        print!("RL {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("RL {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
 }
 
@@ -95,9 +95,9 @@ macro_rules! INC {
         $a = $a.wrapping_add(1);
         $b.flags.z = $a == 0;
         $b.flags.n = false;
-        print!("INC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("INC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
     // $c is unused but is necessary to differentiate
     ($a:expr,$b:expr,$c:expr) => {
@@ -105,8 +105,8 @@ macro_rules! INC {
         cmb = cmb.wrapping_add(1);
         $a = (cmb >> 8) as u8;
         $b = (cmb & 0xff) as u8;
-        println!("INC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
+        #[cfg(debug_assertions)] println!("INC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
     };
 }
 
@@ -116,9 +116,9 @@ macro_rules! DEC {
         $a = $a.wrapping_sub(1);
         $b.flags.z = $a == 0;
         $b.flags.n = true;
-        print!("DEC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("DEC {} {}: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
     // $c is unused but is necessary to differentiate
     ($a:expr,$b:expr,$c:expr) => {
@@ -126,8 +126,8 @@ macro_rules! DEC {
         cmb = cmb.wrapping_sub(1);
         $a = (cmb >> 8) as u8;
         $b = (cmb & 0xff) as u8;
-        println!("DEC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
-                 N_TO_STR!($a), $a, N_TO_STR!($b), $b); //debug
+        #[cfg(debug_assertions)] println!("DEC {}{} {}: {:02x}, {}: {:02x}", N_TO_STR!($a).to_uppercase(), N_TO_STR!($b).to_uppercase(),
+                 N_TO_STR!($a), $a, N_TO_STR!($b), $b);
     };
 }
 
@@ -139,9 +139,9 @@ macro_rules! SUB {
         $b.flags.n = true;
         $b.a = tmp as u8;
         $b.flags.z = $b.a == 0x0;
-        print!("SUB {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("SUB {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
 }
 
@@ -153,9 +153,9 @@ macro_rules! ADD {
         $b.flags.n = true;
         $b.a = tmp as u8;
         $b.flags.z = $b.a == 0x0;
-        print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
 }
 
@@ -167,9 +167,9 @@ macro_rules! CP {
         $b.flags.h = 0x10 == (tmp & 0xf).wrapping_sub($a & 0xf) & 0x10;
         $b.flags.z = tmp2 == 0x0;
         $b.flags.n = true;
-        print!("CP {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a); //debug
-        print_flags!($b.flags); //debug
-        println!(); //debug
+        #[cfg(debug_assertions)] print!("CP {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
     };
 }
 
@@ -213,15 +213,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
     let mut opcode: [u8; 3] = [0; 3];
     for i in 0..3 {
         opcode[i] = state.memory[state.pc as usize + i];
-        // println!("{}: {}", i, opcode[i]); //debug
+        // println!("{}: {}", i, opcode[i]);
     }
 
 
-    print!("{:04x} {:02x}: ", state.pc, opcode[0]); //debug
+    #[cfg(debug_assertions)] print!("{:04x} {:02x}: ", state.pc, opcode[0]);
 
     // FIXME
     // tmp skip DRM
-    if state.pc == 0xe9 || state.pc == 0xfa { state.pc += 2; println!("Skip DRM"); return; }
+    if state.pc == 0xe9 || state.pc == 0xfa { state.pc += 2; #[cfg(debug_assertions)] println!("Skip DRM"); return; }
 
     state.pc += 1;
 
@@ -274,7 +274,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0x11 => { //LD DE,NN
             state.d = opcode[2];
             state.e = opcode[1];
-            println!("LD DE d: {:02x}, e: {:02x}", state.d, state.e); //debug
+            #[cfg(debug_assertions)] println!("LD DE d: {:02x}, e: {:02x}", state.d, state.e);
             state.pc += 2;
         },
         0x12 => {unimplemented_instruction(&state)},
@@ -294,12 +294,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0x17 => { //RLA
             RL!(state.a, state);
             state.flags.z = false;
-            println!("(Above was RLA, flags.z = false)"); //debug
+            #[cfg(debug_assertions)] println!("(Above was RLA, flags.z = false)");
         },
         0x18 => { //JR r8
             state.pc += 1;
             state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
-            println!("JR to {:04x}", state.pc); //debug
+            #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc);
         },
         0x19 => {unimplemented_instruction(&state)},
         0x1a => { //LD A,(DE)
@@ -324,15 +324,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.pc += 1;
             if !state.flags.z {
                 state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
-                println!("JR to {:04x}", state.pc) //debug
+                #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc)
             } else {
-                println!("No JR") //debug
+                #[cfg(debug_assertions)] println!("No JR")
             }
         },
         0x21 => { //LD HL,d16
             state.h = opcode[2];
             state.l = opcode[1];
-            println!("LD HL h: {:02x}, l: {:02x}", state.h, state.l); //debug
+            #[cfg(debug_assertions)] println!("LD HL h: {:02x}, l: {:02x}", state.h, state.l);
             state.pc += 2;
         },
         0x22 => { //LD (HL+),A
@@ -357,9 +357,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.pc += 1;
             if state.flags.z {
                 state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
-                println!("JR to {:04x}", state.pc) //debug
+                #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc)
             } else {
-                println!("No JR") //debug
+                #[cfg(debug_assertions)] println!("No JR")
             }
         },
         0x29 => {unimplemented_instruction(&state)},
@@ -382,7 +382,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0x30 => {unimplemented_instruction(&state)},
         0x31 => { //LD SP,NN
             state.sp = shift_nn(opcode[2], opcode[1]) as usize;
-            println!("sp: {:04x}", state.sp); //debug
+            #[cfg(debug_assertions)] println!("sp: {:04x}", state.sp);
             state.pc += 2;
         },
         0x32 => { //LD (HL-),A
@@ -747,26 +747,26 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.c = state.memory[state.sp];
             state.b = state.memory[state.sp + 1];
             state.sp += 2;
-            println!("POP BC b: {:02x}, c: {:02x}, sp: {:02x}", state.b, state.c, state.sp); //debug
+            #[cfg(debug_assertions)] println!("POP BC b: {:02x}, c: {:02x}, sp: {:02x}", state.b, state.c, state.sp);
         },
         0xc2 => { //JP NZ,a16
             if state.flags.z {
                 state.pc = shift_nn(opcode[2], opcode[1]);
-                println!("JP pc: {:04x}", state.pc); //debug
+                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
             } else {
-                println!("JP skipped!"); //debug
+                #[cfg(debug_assertions)] println!("JP skipped!");
             }
         },
         0xc3 => { //JP a16
             state.pc = shift_nn(opcode[2], opcode[1]);
-            println!("JP pc: {:04x}", state.pc); //debug
+            #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
         },
         0xc4 => {unimplemented_instruction(&state)},
         0xc5 => { //PUSH BC
             state.sp -= 2;
             state.memory[state.sp] = state.c;
             state.memory[state.sp + 1] = state.b;
-            println!("PUSH BC (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+            #[cfg(debug_assertions)] println!("PUSH BC (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xc6 => {unimplemented_instruction(&state)},
         0xc7 => {unimplemented_instruction(&state)},
@@ -774,13 +774,13 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xc9 => { //RET
             state.pc = state.memory[state.sp] as u16;
             state.pc |= (state.memory[state.sp + 1] as u16) << 8;
-            println!("RET memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+            #[cfg(debug_assertions)] println!("RET memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
             state.sp += 2;
-            println!("RET pc: {:04x}", state.pc); //debug
+            #[cfg(debug_assertions)] println!("RET pc: {:04x}", state.pc);
         },
         0xca => {unimplemented_instruction(&state)},
         0xcb => { // PREFIX
-            print!("Prefix: "); //debug
+            #[cfg(debug_assertions)] print!("Prefix: ");
             state.pc += 1;
             let register = opcode[1] & 0x7;
             let mut val: u8 = match register {
@@ -807,9 +807,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
                         state.flags.n = false;
                         state.flags.h = false;
                         state.flags.c = 0x100 == tmp & 0x100;
-                        print!("RL {:02x} {:02x}: {:02x} ", register, register, val); //debug
-                        print_flags!(state.flags); //debug
-                        println!(); //debug
+                        #[cfg(debug_assertions)] print!("RL {:02x} {:02x}: {:02x} ", register, register, val);
+                        #[cfg(debug_assertions)] print_flags!(state.flags);
+                        #[cfg(debug_assertions)] println!();
                     } else {
                         unimplemented_instruction(state);
                     }
@@ -826,7 +826,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
                     state.flags.n = false;
                     state.flags.h = true;
                     write = false;
-                    println!("BIT {},{:02x} flags.z: {}", bit, register, state.flags.z); //debug
+                    #[cfg(debug_assertions)] println!("BIT {},{:02x} flags.z: {}", bit, register, state.flags.z);
                 },
                 _ => unimplemented_instruction(&state),
             }
@@ -842,7 +842,6 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
                     7 => state.a = val,
                     _ => unreachable!()
                 };
-                println!("wrote");
             }
         },
         0xcc => {unimplemented_instruction(&state)},
@@ -853,8 +852,8 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.memory[state.sp] = (state.pc & 0xff) as u8;
             state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
             state.pc = shift_nn(opcode[2], opcode[1]);
-            println!("CALL NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
-                     opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]); //debug
+            #[cfg(debug_assertions)] println!("CALL NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                     opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
         },
         0xce => {unimplemented_instruction(&state)},
         0xcf => {unimplemented_instruction(&state)},
@@ -864,7 +863,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.e = state.memory[state.sp];
             state.d = state.memory[state.sp + 1];
             state.sp += 2;
-            println!("POP DE d: {:02x}, e: {:02x}, sp: {:02x}", state.d, state.e, state.sp); //debug
+            #[cfg(debug_assertions)] println!("POP DE d: {:02x}, e: {:02x}, sp: {:02x}", state.d, state.e, state.sp);
         },
         0xd2 => {unimplemented_instruction(&state)},
         0xd3 => {unimplemented_instruction(&state)},
@@ -873,7 +872,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.sp -= 2;
             state.memory[state.sp] = state.e;
             state.memory[state.sp + 1] = state.d;
-            println!("PUSH DE (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+            #[cfg(debug_assertions)] println!("PUSH DE (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xd6 => {unimplemented_instruction(&state)},
         0xd7 => {unimplemented_instruction(&state)},
@@ -889,19 +888,19 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xe0 => { //LDH (a8),A [LD (0xff00+a8),A]
             state.pc += 1;
             LD!(M!(opcode[1], state), state.a);
-            println!("(above was)LD (0xff00+a8),A ({:04x}): {:02x} a: {:02x}", 0xff00 + opcode[1] as u16,
-                     state.memory[(0xff00 + opcode[1] as u16) as usize], state.a); //debug
+            #[cfg(debug_assertions)] println!("(above was)LD (0xff00+a8),A ({:04x}): {:02x} a: {:02x}", 0xff00 + opcode[1] as u16,
+                     state.memory[(0xff00 + opcode[1] as u16) as usize], state.a);
         },
         0xe1 => { //POP HL
             state.l = state.memory[state.sp];
             state.h = state.memory[state.sp + 1];
             state.sp += 2;
-            println!("POP HL h: {:02x}, l: {:02x}, sp: {:02x}", state.h, state.l, state.sp); //debug
+            #[cfg(debug_assertions)] println!("POP HL h: {:02x}, l: {:02x}, sp: {:02x}", state.h, state.l, state.sp);
         },
         0xe2 => { //LD (C),A
             state.memory[(0xff00 & state.c as u16) as usize] = state.a;
-            println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}",
-                     state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a); //debug
+            #[cfg(debug_assertions)] println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}",
+                     state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a);
         },
         0xe3 => {unimplemented_instruction(&state)},
         0xe4 => {unimplemented_instruction(&state)},
@@ -909,7 +908,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             state.sp -= 2;
             state.memory[state.sp] = state.l;
             state.memory[state.sp + 1] = state.h;
-            println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp); //debug
+            #[cfg(debug_assertions)] println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
         0xe6 => {unimplemented_instruction(&state)},
         0xe7 => {unimplemented_instruction(&state)},
@@ -918,8 +917,8 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xea => { // LD (a16),A
             state.pc += 2;
             LD!(state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
-            println!("(above was)LD (a16),A ({:04x}): {:02x} a: {:02x}", shift_nn(opcode[2], opcode[1]),
-                     state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a); //debug
+            #[cfg(debug_assertions)] println!("(above was)LD (a16),A ({:04x}): {:02x} a: {:02x}", shift_nn(opcode[2], opcode[1]),
+                     state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
         },
         0xeb => {unimplemented_instruction(&state)},
         0xec => {unimplemented_instruction(&state)},
@@ -930,15 +929,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xf0 => { //LDH A,(a8) [LD A,(0xff00+a8)]
             state.pc += 1;
             LD!(state.a, state.memory[(0xff00 + opcode[1] as u16) as usize]);
-            println!("(above was)LD A,(0xff00+a8) a: {:02x} ({:04x}): {:02x}", state.a,
-                     0xff00 + opcode[1] as u16, state.memory[(0xff00 + opcode[1] as u16) as usize]); //debug
+            #[cfg(debug_assertions)] println!("(above was)LD A,(0xff00+a8) a: {:02x} ({:04x}): {:02x}", state.a,
+                     0xff00 + opcode[1] as u16, state.memory[(0xff00 + opcode[1] as u16) as usize]);
 
             //TODO tmp
             // Since the boot sequence waits for the screen but this isn't implemented
             // We just do it manually
             if 0xff00 + opcode[1] as u16 == 0xff44 {
                 state.a = 0x90;
-                println!("tmp set a to 0x90");
+                #[cfg(debug_assertions)] println!("tmp set a to 0x90");
             }
         },
         0xf1 => {unimplemented_instruction(&state)},
