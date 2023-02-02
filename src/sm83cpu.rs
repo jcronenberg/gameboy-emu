@@ -998,7 +998,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("POP BC b: {:02x}, c: {:02x}, sp: {:02x}", state.b, state.c, state.sp);
         },
         0xc2 => { //JP NZ,a16
-            if state.flags.z {
+            if !state.flags.z {
                 state.pc = shift_nn(opcode[2], opcode[1]);
                 #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
             } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
