@@ -213,6 +213,19 @@ macro_rules! XOR {
     };
 }
 
+macro_rules! OR {
+    ($address:expr,$state:expr) => {
+        $state.a |= $address;
+        $state.flags.z = 0x0 == $state.a;
+        $state.flags.c = false;
+        $state.flags.h = false;
+        $state.flags.n = false;
+        #[cfg(debug_assertions)] print!("OR {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! CP {
     ($address:expr,$state:expr) => {
         let tmp = $state.a;
@@ -821,14 +834,30 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             XOR!(state.a, state);
         },
 
-        0xb0 => {unimplemented_instruction(&state)},
-        0xb1 => {unimplemented_instruction(&state)},
-        0xb2 => {unimplemented_instruction(&state)},
-        0xb3 => {unimplemented_instruction(&state)},
-        0xb4 => {unimplemented_instruction(&state)},
-        0xb5 => {unimplemented_instruction(&state)},
-        0xb6 => {unimplemented_instruction(&state)},
-        0xb7 => {unimplemented_instruction(&state)},
+        0xb0 => { //OR B
+            OR!(state.b, state);
+        },
+        0xb1 => { //OR C
+            OR!(state.c, state);
+        },
+        0xb2 => { //OR D
+            OR!(state.d, state);
+        },
+        0xb3 => { //OR E
+            OR!(state.e, state);
+        },
+        0xb4 => { //OR H
+            OR!(state.h, state);
+        },
+        0xb5 => { //OR L
+            OR!(state.l, state);
+        },
+        0xb6 => { //OR (HL)
+            OR!(M!(state.h, state.l, state), state);
+        },
+        0xb7 => { //OR A
+            OR!(state.a, state);
+        },
         0xb8 => { //CP B
             CP!(state.b, state);
         },
