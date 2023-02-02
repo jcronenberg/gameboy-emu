@@ -1167,12 +1167,16 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("(above was)LD A,(0xff00+a8) a: {:02x} ({:04x}): {:02x}", state.a,
                      0xff00 + opcode[1] as u16, state.memory[(0xff00 + opcode[1] as u16) as usize]);
 
-            //TODO tmp
+            // FIXME tmp
             // Since the boot sequence waits for the screen but this isn't implemented
             // We just do it manually
-            if 0xff00 + opcode[1] as u16 == 0xff44 {
+            if 0xff00 + opcode[1] as u16 == 0xff44 && state.pc == 0x66 {
                 state.a = 0x90;
                 #[cfg(debug_assertions)] println!("tmp set a to 0x90");
+            }
+            if 0xff00 + opcode[1] as u16 == 0xff44 && state.pc == 0x235 {
+                state.a = 0x94;
+                #[cfg(debug_assertions)] println!("tmp set a to 0x94");
             }
         },
         0xf1 => {unimplemented_instruction(&state)},
