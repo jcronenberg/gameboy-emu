@@ -36,7 +36,7 @@ pub struct StateSM83 {
     pub l: u8,
     pub sp: usize,
     pub pc: u16,
-    pub memory: [u8; 0xffff],
+    pub memory: [u8; 0x10000],
     pub flags: Flags,
     pub int_enable: bool,
 }
@@ -53,7 +53,7 @@ impl StateSM83 {
             l: 0,
             sp: 0,
             pc: 0,
-            memory: [0; 0xffff],
+            memory: [0; 0x10000],
             flags: Flags::new(),
             int_enable: true,
         }
