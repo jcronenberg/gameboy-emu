@@ -200,6 +200,19 @@ macro_rules! AND {
     };
 }
 
+macro_rules! XOR {
+    ($address:expr,$state:expr) => {
+        $state.a ^= $address;
+        $state.flags.z = 0x0 == $state.a;
+        $state.flags.c = false;
+        $state.flags.h = false;
+        $state.flags.n = false;
+        #[cfg(debug_assertions)] print!("XOR {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! CP {
     ($address:expr,$state:expr) => {
         let tmp = $state.a;
@@ -783,19 +796,29 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xa7 => { //AND A
             AND!(state.a, state);
         },
-        0xa8 => {unimplemented_instruction(&state)},
-        0xa9 => {unimplemented_instruction(&state)},
-        0xaa => {unimplemented_instruction(&state)},
-        0xab => {unimplemented_instruction(&state)},
-        0xac => {unimplemented_instruction(&state)},
-        0xad => {unimplemented_instruction(&state)},
-        0xae => {unimplemented_instruction(&state)},
+        0xa8 => { //XOR B
+            XOR!(state.b, state);
+        },
+        0xa9 => { //XOR C
+            XOR!(state.c, state);
+        },
+        0xaa => { //XOR D
+            XOR!(state.d, state);
+        },
+        0xab => { //XOR E
+            XOR!(state.e, state);
+        },
+        0xac => { //XOR H
+            XOR!(state.h, state);
+        },
+        0xad => { //XOR L
+            XOR!(state.l, state);
+        },
+        0xae => { //XOR (HL)
+            XOR!(M!(state.h, state.l, state), state);
+        },
         0xaf => { //XOR A
-            state.a = 0x00;
-            state.flags.z = true;
-            state.flags.c = false;
-            state.flags.h = false;
-            state.flags.n = false;
+            XOR!(state.a, state);
         },
 
         0xb0 => {unimplemented_instruction(&state)},
