@@ -145,6 +145,20 @@ macro_rules! SUB {
     };
 }
 
+macro_rules! SBC {
+    ($address:expr,$state:expr) => {
+        $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_sub($address.wrapping_sub($state.flags.c as u8) & 0xf) & 0x10;
+        let tmp: u16 = ($state.a as u16).wrapping_sub($address as u16);
+        $state.flags.c = 0x100 == tmp & 0x100;
+        $state.flags.n = true;
+        $state.a = tmp as u8;
+        $state.flags.z = $state.a == 0x0;
+        #[cfg(debug_assertions)] print!("SBC {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! ADD {
     ($address:expr,$state:expr) => {
         $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_add($address & 0xf) & 0x10;
@@ -707,14 +721,30 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0x97 => { //SUB A
             SUB!(state.a, state);
         },
-        0x98 => {unimplemented_instruction(&state)},
-        0x99 => {unimplemented_instruction(&state)},
-        0x9a => {unimplemented_instruction(&state)},
-        0x9b => {unimplemented_instruction(&state)},
-        0x9c => {unimplemented_instruction(&state)},
-        0x9d => {unimplemented_instruction(&state)},
-        0x9e => {unimplemented_instruction(&state)},
-        0x9f => {unimplemented_instruction(&state)},
+        0x98 => { //SBC A,B
+            SBC!(state.b, state);
+        },
+        0x99 => { //SBC A,C
+            SBC!(state.c, state);
+        },
+        0x9a => { //SBC A,D
+            SBC!(state.d, state);
+        },
+        0x9b => { //SBC A,E
+            SBC!(state.e, state);
+        },
+        0x9c => { //SBC A,H
+            SBC!(state.h, state);
+        },
+        0x9d => { //SBC A,L
+            SBC!(state.l, state);
+        },
+        0x9e => { //SBC A,(HL)
+            SBC!(M!(state.h, state.l, state), state);
+        },
+        0x9f => { //SBC A,A
+            SBC!(state.a, state);
+        },
 
         0xa0 => {unimplemented_instruction(&state)},
         0xa1 => {unimplemented_instruction(&state)},
