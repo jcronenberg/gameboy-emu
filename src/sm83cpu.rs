@@ -1162,7 +1162,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.sp += 2;
             #[cfg(debug_assertions)] println!("POP DE d: {:02x}, e: {:02x}, sp: {:02x}", state.d, state.e, state.sp);
         },
-        0xd2 => {unimplemented_instruction(&state)},
+        0xd2 => { //JP NC,a16
+            if !state.flags.c {
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
+        },
         0xd3 => {unimplemented_instruction(&state)},
         0xd4 => { //CALL NC,a16
             if !state.flags.c {
