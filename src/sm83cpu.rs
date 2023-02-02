@@ -1089,7 +1089,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         },
         0xd9 => {unimplemented_instruction(&state)},
         0xda => {unimplemented_instruction(&state)},
-        0xdb => {unimplemented_instruction(&state)},
+        0xdb => { //no instruction
+            unimplemented_instruction(&state)
+        },
         0xdc => { //CALL C,a16
             if state.flags.c {
                 // TODO this may be incorrect, check this maybe later
@@ -1102,7 +1104,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                                                   opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
             } else { #[cfg(debug_assertions)] println!("CALL C skipped"); }
         },
-        0xdd => {unimplemented_instruction(&state)},
+        0xdd => { //no instruction
+            unimplemented_instruction(&state)
+        },
         0xde => {unimplemented_instruction(&state)},
         0xdf => {unimplemented_instruction(&state)},
 
@@ -1123,8 +1127,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("LD (0xff00+C),A (0xff{:02x}): {:02x}, a: {:02x}",
                      state.c, state.memory[(0xff00 & state.c as u16) as usize], state.a);
         },
-        0xe3 => {unimplemented_instruction(&state)},
-        0xe4 => {unimplemented_instruction(&state)},
+        0xe3 => { //no instruction
+            unimplemented_instruction(&state)
+        },
+        0xe4 => { //no instruction
+            unimplemented_instruction(&state)
+        },
         0xe5 => { //PUSH HL
             state.sp -= 2;
             state.memory[state.sp] = state.l;
@@ -1141,9 +1149,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("(above was)LD (a16),A ({:04x}): {:02x} a: {:02x}", shift_nn(opcode[2], opcode[1]),
                      state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
         },
-        0xeb => {unimplemented_instruction(&state)},
-        0xec => {unimplemented_instruction(&state)},
-        0xed => {unimplemented_instruction(&state)},
+        0xeb => { //no instruction
+            unimplemented_instruction(&state)
+        },
+        0xec => { //no instruction
+            unimplemented_instruction(&state)
+        },
+        0xed => { //no instruction
+            unimplemented_instruction(&state)
+        },
         0xee => {unimplemented_instruction(&state)},
         0xef => {unimplemented_instruction(&state)},
 
@@ -1172,8 +1186,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0xf9 => {unimplemented_instruction(&state)},
         0xfa => {unimplemented_instruction(&state)},
         0xfb => {unimplemented_instruction(&state)},
-        0xfc => {unimplemented_instruction(&state)},
-        0xfd => {unimplemented_instruction(&state)},
+        0xfc => { //no instruction
+            unimplemented_instruction(&state);
+        },
+        0xfd => { //no instruction
+            unimplemented_instruction(&state);
+        },
         0xfe => { //CP d8
             state.pc += 1;
             CP!(opcode[1], state);
