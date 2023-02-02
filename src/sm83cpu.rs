@@ -252,8 +252,8 @@ macro_rules! M {
 }
 
 macro_rules! print_flags {
-    ($state:expr) => {
-        print!("flags: z: {}, n: {}, h: {}, c: {}", $state.z, $state.n, $state.h, $state.c);
+    ($flags:expr) => {
+        print!("flags: z: {}, n: {}, h: {}, c: {}", $flags.z, $flags.n, $flags.h, $flags.c);
     };
 }
 
@@ -430,7 +430,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             }
         },
         0x29 => {unimplemented_instruction(&state)},
-        0x2a => {unimplemented_instruction(&state)},
+        0x2a => { // LD A,(HL+)
+            LD!(state.a, M!(state.h, state.l, state));
+            INC!(state.h, state.l, state);
+        },
         0x2b => { //DEC HL
             DEC!(state.h, state.l, state);
         },
@@ -473,7 +476,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0x37 => {unimplemented_instruction(&state)},
         0x38 => {unimplemented_instruction(&state)},
         0x39 => {unimplemented_instruction(&state)},
-        0x3a => {unimplemented_instruction(&state)},
+        0x3a => { //LD A,(HL-)
+            LD!(state.a, M!(state.h, state.l, state));
+            DEC!(state.h, state.l, state);
+        },
         0x3b => { //DEC SP
             // TODO reevaluate
             // This may not work because sp is usize, so burrows will probably not work correctly
