@@ -1145,7 +1145,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0xe9 => {unimplemented_instruction(&state)},
         0xea => { // LD (a16),A
             state.pc += 2;
-            LD!(state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
+            LD!(M!(opcode[2], opcode[1], state), state.a);
             #[cfg(debug_assertions)] println!("(above was)LD (a16),A ({:04x}): {:02x} a: {:02x}", shift_nn(opcode[2], opcode[1]),
                      state.memory[shift_nn(opcode[2], opcode[1]) as usize], state.a);
         },
