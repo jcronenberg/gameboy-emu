@@ -60,6 +60,7 @@ impl StateSM83 {
     }
 }
 
+#[cfg(debug_assertions)]
 macro_rules! N_TO_STR {
     ($n:expr) => {
         stringify!($n).chars()
@@ -305,6 +306,7 @@ macro_rules! M {
     };
 }
 
+#[cfg(debug_assertions)]
 macro_rules! print_flags {
     ($flags:expr) => {
         print!("flags: z: {}, n: {}, h: {}, c: {}", $flags.z, $flags.n, $flags.h, $flags.c);
