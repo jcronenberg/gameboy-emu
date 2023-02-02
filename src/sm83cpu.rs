@@ -274,6 +274,22 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
     return tmp;
 }
 
+fn flags_to_m(flags: &Flags) -> u8 {
+    let mut m: u8 = 0;
+    m |= (flags.z as u8) << 7;
+    m |= (flags.n as u8) << 6;
+    m |= (flags.h as u8) << 5;
+    m |= (flags.c as u8) << 4;
+    return m;
+}
+
+fn m_to_flags(m: u8, flags: &mut Flags) {
+    flags.z = (m & 0b10000000) > 0;
+    flags.n = (m & 0b01000000) > 0;
+    flags.h = (m & 0b00100000) > 0;
+    flags.c = (m & 0b00010000) > 0;
+}
+
 pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
     // TODO fix for sm83
     // if state.pc >= 0x2000 {
