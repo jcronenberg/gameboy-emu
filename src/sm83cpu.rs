@@ -1045,7 +1045,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.sp += 2;
             #[cfg(debug_assertions)] println!("RET pc: {:04x}", state.pc);
         },
-        0xca => {unimplemented_instruction(&state)},
+        0xca => { //JP Z,a16
+            if state.flags.z {
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
+        },
         0xcb => { // PREFIX
             #[cfg(debug_assertions)] print!("Prefix {:02x}: ", opcode[1]);
             state.pc += 1;
