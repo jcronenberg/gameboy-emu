@@ -883,7 +883,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             CP!(state.a, state);
         },
 
-        0xc0 => {unimplemented_instruction(&state)},
+        0xc0 => { //RET NZ
+            if !state.flags.z {
+                state.pc = state.memory[state.sp] as u16;
+                state.pc |= (state.memory[state.sp + 1] as u16) << 8;
+                #[cfg(debug_assertions)] println!("RET NZ memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+                state.sp += 2;
+                #[cfg(debug_assertions)] println!("RET NZ pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("RET NZ not returned"); }
+        },
         0xc1 => { //POP BC
             state.c = state.memory[state.sp];
             state.b = state.memory[state.sp + 1];
@@ -894,15 +902,24 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
             if state.flags.z {
                 state.pc = shift_nn(opcode[2], opcode[1]);
                 #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
-            } else {
-                #[cfg(debug_assertions)] println!("JP skipped!");
-            }
+            } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
         },
         0xc3 => { //JP a16
             state.pc = shift_nn(opcode[2], opcode[1]);
             #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
         },
-        0xc4 => {unimplemented_instruction(&state)},
+        0xc4 => { //CALL NZ,a16
+            if !state.flags.z {
+                // TODO this may be incorrect, check this maybe later
+                state.pc += 2;
+                state.sp -= 2;
+                state.memory[state.sp] = (state.pc & 0xff) as u8;
+                state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("CALL NZ,NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                                                  opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
+            } else { #[cfg(debug_assertions)] println!("CALL NZ skipped"); }
+        },
         0xc5 => { //PUSH BC
             state.sp -= 2;
             state.memory[state.sp] = state.c;
@@ -911,7 +928,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         },
         0xc6 => {unimplemented_instruction(&state)},
         0xc7 => {unimplemented_instruction(&state)},
-        0xc8 => {unimplemented_instruction(&state)},
+        0xc8 => { //RET Z
+            if state.flags.z {
+                state.pc = state.memory[state.sp] as u16;
+                state.pc |= (state.memory[state.sp + 1] as u16) << 8;
+                #[cfg(debug_assertions)] println!("RET Z memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+                state.sp += 2;
+                #[cfg(debug_assertions)] println!("RET Z pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("RET Z not returned"); }
+        },
         0xc9 => { //RET
             state.pc = state.memory[state.sp] as u16;
             state.pc |= (state.memory[state.sp + 1] as u16) << 8;
@@ -985,7 +1010,18 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
                 };
             }
         },
-        0xcc => {unimplemented_instruction(&state)},
+        0xcc => { //CALL Z,a16
+            if state.flags.z {
+                // TODO this may be incorrect, check this maybe later
+                state.pc += 2;
+                state.sp -= 2;
+                state.memory[state.sp] = (state.pc & 0xff) as u8;
+                state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("CALL Z,NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                                                  opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
+            } else { #[cfg(debug_assertions)] println!("CALL Z skipped"); }
+        },
         0xcd => { //CALL NN
             // TODO this may be incorrect, check this maybe later
             state.pc += 2;
@@ -999,7 +1035,15 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0xce => {unimplemented_instruction(&state)},
         0xcf => {unimplemented_instruction(&state)},
 
-        0xd0 => {unimplemented_instruction(&state)},
+        0xd0 => { //RET NC
+            if !state.flags.c {
+                state.pc = state.memory[state.sp] as u16;
+                state.pc |= (state.memory[state.sp + 1] as u16) << 8;
+                #[cfg(debug_assertions)] println!("RET NC memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+                state.sp += 2;
+                #[cfg(debug_assertions)] println!("RET NC pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("RET NC not returned"); }
+        },
         0xd1 => { //POP DE
             state.e = state.memory[state.sp];
             state.d = state.memory[state.sp + 1];
@@ -1008,7 +1052,18 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         },
         0xd2 => {unimplemented_instruction(&state)},
         0xd3 => {unimplemented_instruction(&state)},
-        0xd4 => {unimplemented_instruction(&state)},
+        0xd4 => { //CALL NC,a16
+            if !state.flags.c {
+                // TODO this may be incorrect, check this maybe later
+                state.pc += 2;
+                state.sp -= 2;
+                state.memory[state.sp] = (state.pc & 0xff) as u8;
+                state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("CALL NC,NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                                                  opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
+            } else { #[cfg(debug_assertions)] println!("CALL NC skipped"); }
+        },
         0xd5 => { //PUSH DE
             state.sp -= 2;
             state.memory[state.sp] = state.e;
@@ -1017,11 +1072,30 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         },
         0xd6 => {unimplemented_instruction(&state)},
         0xd7 => {unimplemented_instruction(&state)},
-        0xd8 => {unimplemented_instruction(&state)},
+        0xd8 => { //RET C
+            if state.flags.c {
+                state.pc = state.memory[state.sp] as u16;
+                state.pc |= (state.memory[state.sp + 1] as u16) << 8;
+                #[cfg(debug_assertions)] println!("RET NC memory: {:04x}", (state.memory[state.sp] as u16) | (state.memory[state.sp + 1] as u16) << 8);
+                state.sp += 2;
+                #[cfg(debug_assertions)] println!("RET NC pc: {:04x}", state.pc);
+            } else { #[cfg(debug_assertions)] println!("RET NC not returned"); }
+        },
         0xd9 => {unimplemented_instruction(&state)},
         0xda => {unimplemented_instruction(&state)},
         0xdb => {unimplemented_instruction(&state)},
-        0xdc => {unimplemented_instruction(&state)},
+        0xdc => { //CALL C,a16
+            if state.flags.c {
+                // TODO this may be incorrect, check this maybe later
+                state.pc += 2;
+                state.sp -= 2;
+                state.memory[state.sp] = (state.pc & 0xff) as u8;
+                state.memory[state.sp + 1] = ((state.pc & 0xff00) >> 8) as u8;
+                state.pc = shift_nn(opcode[2], opcode[1]);
+                #[cfg(debug_assertions)] println!("CALL C,NN nn: {:02x}{:02x}, pc: {:04x}, sp: {:02x} (sp): {:02x}{:02x}",
+                                                  opcode[2], opcode[1], state.pc, state.sp, state.memory[state.sp + 1], state.memory[state.sp]);
+            } else { #[cfg(debug_assertions)] println!("CALL C skipped"); }
+        },
         0xdd => {unimplemented_instruction(&state)},
         0xde => {unimplemented_instruction(&state)},
         0xdf => {unimplemented_instruction(&state)},
