@@ -475,9 +475,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             if !state.flags.z {
                 state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
                 #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc)
-            } else {
-                #[cfg(debug_assertions)] println!("No JR")
-            }
+            } else { #[cfg(debug_assertions)] println!("No JR") }
         },
         0x21 => { //LD HL,d16
             state.h = opcode[2];
