@@ -422,7 +422,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             #[cfg(debug_assertions)] println!("LD DE d: {:02x}, e: {:02x}", state.d, state.e);
             state.pc += 2;
         },
-        0x12 => {unimplemented_instruction(&state)},
+        0x12 => { //LD (DE),A
+            LD!(M!(state.d, state.e, state), state.a);
+        },
         0x13 => { //INC DE
             INC!(state.d, state.e, state);
         },
