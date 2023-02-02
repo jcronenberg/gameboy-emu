@@ -5,6 +5,7 @@ use std::fs::File;
 
 mod disassembler;
 mod sm83cpu;
+mod mmu;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -24,8 +25,19 @@ fn main() {
         }
     }
 
+    let mut state = sm83cpu::StateSM83::new();
+    let mut mmu = mmu::MMU::new();
+
+    // Set up mmu and state.memory
+    mmu.load_boot_rom();
+    mmu.load_cart(&args[2]);
+    mmu.cart_to_mem(&mut state);
+    mmu.boot_rom_to_mem(&mut state);
+
     if args[1] == "hexdump" {
         disassembler::hexdump(buffer);
+    } else if args[1] == "hexdump_memory" {
+        disassembler::hexdump_memory(state);
     } else if args[1] == "disassemble" {
         let length = buffer.len();
         let mut i:usize = 0;
@@ -33,16 +45,9 @@ fn main() {
             i += disassembler::disassemble_sm83_op(&buffer, i);
         }
     } else if args[1] == "emulate" {
-        let mut state = sm83cpu::StateSM83::new();
-
-        //Load memory
-        for i in 0..buffer.len() {
-            state.memory[i] = buffer[i];
-        }
-
         //Main Loop
         loop {
-            sm83cpu::emulate_sm83_op(&mut state);
+            sm83cpu::emulate_sm83_op(&mut state, &mut mmu);
         }
     } else {
         println!("Unknown command!\n");
@@ -62,7 +67,8 @@ fn read_file_to_buf(file: &str, buffer: &mut Vec<u8>) -> io::Result<()> {
 fn usage() {
     println!("USAGE: gameboy-emu <command> <file>\n");
     println!("COMMANDS:");
-    println!("disassemble   disassemble file and output to stdout");
-    println!("hexdump       hexdump file and output to stdout");
-    println!("emulate       emulate file")
+    println!("disassemble     disassemble file and output to stdout");
+    println!("hexdump         hexdump file and output to stdout");
+    println!("hexdump_memory  hexdump all memory after setup is complete to stdout");
+    println!("emulate         emulate file")
 }

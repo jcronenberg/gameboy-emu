@@ -1,3 +1,5 @@
+use crate::sm83cpu;
+
 pub fn disassemble_sm83_op(buffer: &Vec<u8>, pc: usize) -> usize {
     let mut opbytes:usize = 1;
 
@@ -579,4 +581,17 @@ pub fn hexdump(buffer: Vec<u8>) {
             print!("\n");
         }
     }
+}
+
+pub fn hexdump_memory(state: sm83cpu::StateSM83) {
+    for (i, v) in state.memory.iter().enumerate() {
+        if i % 16 == 0 {
+            print!("{:04x} ", i);
+        }
+        print!("{:02x} ", v);
+        if i % 16 == 15 {
+            print!("\n");
+        }
+    }
+    println!();
 }

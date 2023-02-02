@@ -1,3 +1,5 @@
+use crate::mmu;
+
 pub struct Flags {
     pub z: bool,
     // pub s: bool,
@@ -272,7 +274,7 @@ fn shift_nn(shift1: u8, shift2: u8) -> u16 {
     return tmp;
 }
 
-pub fn emulate_sm83_op(state: &mut StateSM83) {
+pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
     // TODO fix for sm83
     // if state.pc >= 0x2000 {
     //     std::process::exit(0);
@@ -286,9 +288,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
 
     #[cfg(debug_assertions)] print!("{:04x} {:02x}: ", state.pc, opcode[0]);
 
-    // FIXME
-    // tmp skip DRM
-    if state.pc == 0xe9 || state.pc == 0xfa { state.pc += 2; #[cfg(debug_assertions)] println!("Skip DRM"); return; }
+    if state.pc == 0x100 { mmu.overwrite_boot_rom(state) }
 
     state.pc += 1;
 
