@@ -30,7 +30,7 @@ fn main() {
         let length = buffer.len();
         let mut i:usize = 0;
         while i < length {
-            i += disassembler::disassemble_SM83_op(&buffer, i);
+            i += disassembler::disassemble_sm83_op(&buffer, i);
         }
     } else if args[1] == "emulate" {
         let mut state = sm83cpu::StateSM83::new();
