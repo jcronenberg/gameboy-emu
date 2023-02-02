@@ -159,6 +159,20 @@ macro_rules! ADD {
     };
 }
 
+macro_rules! ADC {
+    ($a:expr,$b:expr) => {
+        $b.flags.h = 0x10 == ($b.a & 0xf).wrapping_add($a.wrapping_add($b.flags.c as u8) & 0xf) & 0x10;
+        let tmp: u16 = ($b.a as u16).wrapping_add($a as u16);
+        $b.flags.c = 0x100 == tmp & 0x100;
+        $b.flags.n = true;
+        $b.a = tmp as u8;
+        $b.flags.z = $b.a == 0x0;
+        #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($a).to_uppercase(), N_TO_STR!($a), $a, $b.a);
+        #[cfg(debug_assertions)] print_flags!($b.flags);
+        #[cfg(debug_assertions)] println!();
+    };
+}
+
 macro_rules! CP {
     ($a:expr,$b:expr) => {
         let tmp = $b.a;
@@ -644,14 +658,30 @@ pub fn emulate_sm83_op(state: &mut StateSM83) {
         0x87 => { //ADD A,A
             ADD!(state.a, state);
         },
-        0x88 => {unimplemented_instruction(&state)},
-        0x89 => {unimplemented_instruction(&state)},
-        0x8a => {unimplemented_instruction(&state)},
-        0x8b => {unimplemented_instruction(&state)},
-        0x8c => {unimplemented_instruction(&state)},
-        0x8d => {unimplemented_instruction(&state)},
-        0x8e => {unimplemented_instruction(&state)},
-        0x8f => {unimplemented_instruction(&state)},
+        0x88 => { //ADC A,B
+            ADC!(state.b, state);
+        },
+        0x89 => { //ADC A,C
+            ADC!(state.c, state);
+        },
+        0x8a => { //ADC A,D
+            ADC!(state.d, state);
+        },
+        0x8b => { //ADC A,E
+            ADC!(state.e, state);
+        },
+        0x8c => { //ADC A,H
+            ADC!(state.h, state);
+        },
+        0x8d => { //ADC A,L
+            ADC!(state.l, state);
+        },
+        0x8e => { //ADC A,(HL)
+            ADC!(M!(state.h, state.l, state), state);
+        },
+        0x8f => { //ADC A,A
+            ADC!(state.b, state);
+        },
 
         0x90 => { //SUB B
             SUB!(state.b, state);
