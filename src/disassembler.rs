@@ -593,5 +593,4 @@ pub fn hexdump_memory(state: sm83cpu::StateSM83) {
             print!("\n");
         }
     }
-    println!();
 }
