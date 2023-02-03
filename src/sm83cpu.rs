@@ -391,8 +391,13 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             RLC!(state.a, state);
             state.flags.z = false;
         },
-        0x08 => {unimplemented_instruction(&state)},
         0x09 => {unimplemented_instruction(&state)},
+        0x08 => { //LD (a16),SP
+            state.pc += 2;
+            let sp: u16 = state.sp as u16;
+            LD!(M!(opcode[2], opcode[1], state), (sp & 0xff) as u8);
+            LD!(state.memory[shift_nn(opcode[2], opcode[1]).wrapping_add(1) as usize], (sp >> 8) as u8);
+        },
         0x0a => { //LD A,(BC)
             LD!(state.a, M!(state.b, state.c, state));
         },
