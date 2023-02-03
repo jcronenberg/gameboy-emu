@@ -373,7 +373,13 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
     //     std::process::exit(0);
     // }
     let mut opcode: [u8; 3] = [0; 3];
-    for i in 0..3 {
+    let mut opcode_size: usize = 3;
+    if state.pc == 0xfffe {
+        opcode_size = 2;
+    } else if state.pc == 0xffff {
+        opcode_size = 1;
+    }
+    for i in 0..opcode_size {
         opcode[i] = state.memory[state.pc as usize + i];
         // println!("{}: {}", i, opcode[i]);
     }
@@ -383,7 +389,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
 
     if state.pc == 0x100 { mmu.overwrite_boot_rom(state) }
 
-    state.pc += 1;
+    state.pc = state.pc.wrapping_add(1);
 
     match opcode[0] {
         0x00 => {}, //NOP
