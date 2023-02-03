@@ -1276,7 +1276,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.memory[state.sp + 1] = state.h;
             #[cfg(debug_assertions)] println!("PUSH HL (SP): {:02x}{:02x}, sp: {:02x}", state.memory[state.sp], state.memory[state.sp + 1], state.sp);
         },
-        0xe6 => {unimplemented_instruction(&state)},
+        0xe6 => { //AND d8
+            state.pc += 1;
+            AND!(opcode[1], state);
+        },
         0xe7 => { //RST 20H
             RST!(0x20, state);
         },
