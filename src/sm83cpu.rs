@@ -311,6 +311,13 @@ macro_rules! RST {
     };
 }
 
+macro_rules! JP {
+    ($address1:expr,$address2:expr,$state:expr) => {
+        $state.pc = shift_nn($address1, $address2);
+        #[cfg(debug_assertions)] println!("JP pc: {:04x}", $state.pc);
+    };
+}
+
 macro_rules! M {
     ($address1:expr,$address2:expr,$state:expr) => {
         $state.memory[shift_nn($address1, $address2) as usize]
@@ -1038,13 +1045,11 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         },
         0xc2 => { //JP NZ,a16
             if !state.flags.z {
-                state.pc = shift_nn(opcode[2], opcode[1]);
-                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+                JP!(opcode[2], opcode[1], state);
             } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
         },
         0xc3 => { //JP a16
-            state.pc = shift_nn(opcode[2], opcode[1]);
-            #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+            JP!(opcode[2], opcode[1], state);
         },
         0xc4 => { //CALL NZ,a16
             if !state.flags.z {
@@ -1086,8 +1091,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         },
         0xca => { //JP Z,a16
             if state.flags.z {
-                state.pc = shift_nn(opcode[2], opcode[1]);
-                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+                JP!(opcode[2], opcode[1], state);
             } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
         },
         0xcb => { // PREFIX
@@ -1217,8 +1221,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         },
         0xd2 => { //JP NC,a16
             if !state.flags.c {
-                state.pc = shift_nn(opcode[2], opcode[1]);
-                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+                JP!(opcode[2], opcode[1], state);
             } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
         },
         0xd3 => {unimplemented_instruction(&state)},
@@ -1256,8 +1259,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0xd9 => {unimplemented_instruction(&state)},
         0xda => { //JP C,a16
             if state.flags.c {
-                state.pc = shift_nn(opcode[2], opcode[1]);
-                #[cfg(debug_assertions)] println!("JP pc: {:04x}", state.pc);
+                JP!(opcode[2], opcode[1], state);
             } else { #[cfg(debug_assertions)] println!("JP skipped!"); }
         },
         0xdb => { //no instruction
@@ -1320,7 +1322,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             RST!(0x20, state);
         },
         0xe8 => {unimplemented_instruction(&state)},
-        0xe9 => {unimplemented_instruction(&state)},
+        0xe9 => { //JP HL
+            JP!(state.h, state.l, state);
+        },
         0xea => { // LD (a16),A
             state.pc += 2;
             LD!(M!(opcode[2], opcode[1], state), state.a);
