@@ -1128,6 +1128,20 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                         RR!(val, state);
                     }
                 },
+                // SWAP and SRL
+                0x3 => {
+                    // SWAP
+                    if opcode[1] >> 3 & 0x1 == 0 {
+                        let tmp: u8 = val & 0b11110000;
+                        val = val << 4;
+                        val |= tmp;
+                        state.flags.z = val == 0x0;
+                        state.flags.c = false;
+                        state.flags.h = false;
+                        state.flags.n = false;
+                        #[cfg(debug_assertions)] println!("SWAP {:02x}", register);
+                    }
+                }
                 // All BIT instructions
                 0x4 |
                 0x5 |
