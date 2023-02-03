@@ -9,6 +9,7 @@ pub struct MMU {
     boot_finished: bool,
     boot_rom: [u8; 0x100],
     cart: [u8; 0x8000],
+    pub interrupt_enabled: bool,
 }
 
 impl MMU {
@@ -18,6 +19,7 @@ impl MMU {
             boot_finished: false,
             boot_rom: [0; 0x100],
             cart: [0; 0x8000],
+            interrupt_enabled: false,
         }
     }
 

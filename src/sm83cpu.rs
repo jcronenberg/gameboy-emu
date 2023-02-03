@@ -1356,7 +1356,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
         0xf2 => { //LD A,(C)
             LD!(state.a, state.memory[(0xff00 + state.c as u16) as usize]);
         },
-        0xf3 => {unimplemented_instruction(&state)},
+        0xf3 => { //DI
+            mmu.interrupt_enabled = false;
+            #[cfg(debug_assertions)] println!("Disabled interrupt");
+        },
         0xf4 => { //no instruction
             unimplemented_instruction(&state)
         },
@@ -1378,7 +1381,10 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 2;
             LD!(state.a, M!(opcode[2], opcode[1], state));
         },
-        0xfb => {unimplemented_instruction(&state)},
+        0xfb => { //EI
+            mmu.interrupt_enabled = true;
+            #[cfg(debug_assertions)] println!("Enabled interrupt");
+        },
         0xfc => { //no instruction
             unimplemented_instruction(&state);
         },
