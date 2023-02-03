@@ -216,6 +216,20 @@ macro_rules! ADD {
         #[cfg(debug_assertions)] print_flags!($state.flags);
         #[cfg(debug_assertions)] println!();
     };
+    ($address1:expr,$address2:expr,$state:expr) => {
+        let hl: u16 = (($state.h as u16) << 8) | $state.l as u16;
+        let a12: u16 = (($address1 as u16) << 8) | $address2 as u16;
+        $state.flags.h = 0x1000 == (a12 & 0xfff).wrapping_add(hl & 0xfff) & 0x1000;
+        let tmp: u32 = (a12 as u32).wrapping_add(hl as u32);
+        $state.flags.c = 0x10000 == tmp & 0x10000;
+        $state.flags.n = false;
+        $state.h = ((tmp as u16) & 0xff00) as u8;
+        $state.l = ((tmp as u16) & 0x00ff) as u8;
+        #[cfg(debug_assertions)] print!("ADD HL {}{} h: {:02x} l: {:02x} ", N_TO_STR!($address1).to_uppercase(), N_TO_STR!($address2).to_uppercase(),
+                                        $state.h, $state.l);
+        #[cfg(debug_assertions)] print_flags!($state.flags);
+        #[cfg(debug_assertions)] println!();
+    };
 }
 
 macro_rules! ADC {
@@ -391,12 +405,14 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             RLC!(state.a, state);
             state.flags.z = false;
         },
-        0x09 => {unimplemented_instruction(&state)},
         0x08 => { //LD (a16),SP
             state.pc += 2;
             let sp: u16 = state.sp as u16;
             LD!(M!(opcode[2], opcode[1], state), (sp & 0xff) as u8);
             LD!(state.memory[shift_nn(opcode[2], opcode[1]).wrapping_add(1) as usize], (sp >> 8) as u8);
+        },
+        0x09 => { //ADD HL,BC
+            ADD!(state.b, state.c, state);
         },
         0x0a => { //LD A,(BC)
             LD!(state.a, M!(state.b, state.c, state));
@@ -455,7 +471,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc = state.pc.wrapping_add((opcode[1] as i8) as u16);
             #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc);
         },
-        0x19 => {unimplemented_instruction(&state)},
+        0x19 => { //ADD HL,DE
+            ADD!(state.d, state.e, state);
+        },
         0x1a => { //LD A,(DE)
             LD!(state.a, M!(state.d, state.e, state));
         },
@@ -517,7 +535,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                 #[cfg(debug_assertions)] println!("No JR")
             }
         },
-        0x29 => {unimplemented_instruction(&state)},
+        0x29 => { // ADD HL,HL
+            ADD!(state.h, state.l, state);
+        },
         0x2a => { // LD A,(HL+)
             LD!(state.a, M!(state.h, state.l, state));
             INC!(state.h, state.l, state);
@@ -585,7 +605,9 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
                 #[cfg(debug_assertions)] println!("JR to {:04x}", state.pc)
             } else { #[cfg(debug_assertions)] println!("No JR") }
         },
-        0x39 => {unimplemented_instruction(&state)},
+        0x39 => { //ADD HL,SP
+            ADD!((state.sp >> 8) as u8, (state.sp & 0xff) as u8, state);
+        },
         0x3a => { //LD A,(HL-)
             LD!(state.a, M!(state.h, state.l, state));
             DEC!(state.h, state.l, state);
