@@ -209,7 +209,7 @@ macro_rules! ADD {
         $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_add($address & 0xf) & 0x10;
         let tmp: u16 = ($state.a as u16).wrapping_add($address as u16);
         $state.flags.c = 0x100 == tmp & 0x100;
-        $state.flags.n = true;
+        $state.flags.n = false;
         $state.a = tmp as u8;
         $state.flags.z = $state.a == 0x0;
         #[cfg(debug_assertions)] print!("ADD {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
@@ -223,7 +223,7 @@ macro_rules! ADC {
         $state.flags.h = 0x10 == ($state.a & 0xf).wrapping_add($address.wrapping_add($state.flags.c as u8) & 0xf) & 0x10;
         let tmp: u16 = ($state.a as u16).wrapping_add($address as u16);
         $state.flags.c = 0x100 == tmp & 0x100;
-        $state.flags.n = true;
+        $state.flags.n = false;
         $state.a = tmp as u8;
         $state.flags.z = $state.a == 0x0;
         #[cfg(debug_assertions)] print!("ADC {} {}: {:02x} a: {:02x} ", N_TO_STR!($address).to_uppercase(), N_TO_STR!($address), $address, $state.a);
