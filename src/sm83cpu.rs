@@ -572,7 +572,12 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             state.pc += 1;
             LD!(M!(state.h, state.l, state), opcode[1]);
         },
-        0x37 => {unimplemented_instruction(&state)},
+        0x37 => { //SCF
+            state.flags.n = false;
+            state.flags.h = false;
+            state.flags.c = true;
+            #[cfg(debug_assertions)] println!("SCF");
+        },
         0x38 => { //JR C,r8
             state.pc += 1;
             if state.flags.c {
