@@ -797,7 +797,7 @@ pub fn emulate_sm83_op(state: &mut StateSM83, mmu: &mut mmu::MMU) {
             LD!(state.a, state.l);
         },
         0x7e => { //LD A,(HL)
-            unimplemented_instruction(&state);
+            LD!(state.a, M!(state.h, state.l, state));
         },
         0x7f => { //LD A,A
             LD!(state.a, state.a);
